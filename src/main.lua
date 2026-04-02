@@ -20,7 +20,7 @@ lib = mods["adamant-ModpackLib"]
 
 local config = chalk.auto("config.lua")
 
-local PACK_ID = error("TODO: set PACK_ID to your pack id")
+local PACK_ID = "run-director"
 
 SpecialModule_Internal = SpecialModule_Internal or {}
 local internal = SpecialModule_Internal
