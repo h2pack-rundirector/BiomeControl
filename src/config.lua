@@ -15,7 +15,7 @@ return {
     OnlyAllowForcedEncounters = false,
     IgnoreMaxDepth = false,
     NPCSpacing = 6,
-    
+
     PrioritizeSpecificRewardEnabled = false,
     PriorityBiome1 = "",
     PriorityBiome2 = "",
