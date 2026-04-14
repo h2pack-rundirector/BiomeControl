@@ -20,7 +20,7 @@ local function Read(key)
 end
 
 local function Log(fmt, ...)
-    lib.log(definition.id, Read("DebugMode") == true, fmt, ...)
+    lib.logging.logIf(definition.id, Read("DebugMode") == true, fmt, ...)
 end
 
 local function GetDefinitionMode(def)

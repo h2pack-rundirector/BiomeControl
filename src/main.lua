@@ -116,7 +116,7 @@ AddDepthStorageNodes(internal.npcDefinitions)
 -- STORE
 -- =============================================================================
 
-public.store = lib.createStore(config, definition, dataDefaults)
+public.store = lib.store.create(config, definition, dataDefaults)
 store = public.store
 RunDirectorBiomeControl_Public = public
 
@@ -124,7 +124,7 @@ RunDirectorBiomeControl_Public = public
 -- UI NODE REGISTRIES
 -- Built after createStore so storage aliases are resolved.
 -- Nodes are not in definition.ui — BiomeControl uses custom DrawTab.
--- ui.lua calls lib.drawUiNode via these lookup tables.
+-- ui.lua calls lib.ui.drawNode via these lookup tables.
 -- =============================================================================
 
 local uiNodes = {
@@ -182,7 +182,7 @@ for _, field in ipairs(internal.specialRangeFields) do
     })
 end
 
-internal.uiNodes = lib.prepareUiNodes(uiNodes, "BiomeControl ui", definition.storage)
+internal.uiNodes = lib.ui.prepareNodes(uiNodes, "BiomeControl ui", definition.storage)
 
 -- =============================================================================
 -- PATCH PLAN + HOOKS
@@ -207,8 +207,8 @@ end
 local function init()
     import_as_fallback(rom.game)
     registerHooks()
-    if lib.isEnabled(store, definition.modpack) then
-        lib.applyDefinition(definition, store)
+    if lib.coordinator.isEnabled(store, definition.modpack) then
+        lib.mutation.apply(definition, store)
     end
 end
 
@@ -218,7 +218,7 @@ modutil.once_loaded.game(function()
     loader.load(init, init)
 end)
 
-local standaloneUi = lib.standaloneSpecialUI(
+local standaloneUi = lib.special.standaloneUI(
     public.definition,
     store,
     store.uiState,

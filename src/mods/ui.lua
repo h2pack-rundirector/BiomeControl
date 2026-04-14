@@ -43,7 +43,7 @@ end
 local function DrawManagedField(ui, uiState, alias, width)
     local node = internal.uiNodes[alias]
     if not node then return end
-    lib.drawUiNode(ui, node, uiState, width)
+    lib.ui.drawNode(ui, node, uiState, width)
 end
 
 local function DrawSummaryRow(ui, label, summary)

@@ -5,7 +5,7 @@ local function Read(key)
 end
 
 local function IsEnabled()
-    return lib.isEnabled(store, internal.packId)
+    return lib.coordinator.isEnabled(store, internal.packId)
 end
 
 internal.BiomeControlRead = Read
