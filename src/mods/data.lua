@@ -35,6 +35,7 @@ internal.modeEntryLookup = {}
 internal.modeStorageFields = {}
 internal.priorityOptions = { "" }
 internal.priorityDisplayValues = { [""] = "None" }
+internal.priorityValueColors = {}
 internal.roomModeValues = { "default", "disabled", "forced" }
 internal.roomModeDisplayValues = {
     default = "Default",
@@ -149,20 +150,29 @@ end
 
 do
     local priorityGods = {
-        { label = "Aphrodite", lootKey = "AphroditeUpgrade" },
-        { label = "Apollo", lootKey = "ApolloUpgrade" },
-        { label = "Ares", lootKey = "AresUpgrade" },
-        { label = "Demeter", lootKey = "DemeterUpgrade" },
-        { label = "Hephaestus", lootKey = "HephaestusUpgrade" },
-        { label = "Hera", lootKey = "HeraUpgrade" },
-        { label = "Hestia", lootKey = "HestiaUpgrade" },
-        { label = "Poseidon", lootKey = "PoseidonUpgrade" },
-        { label = "Zeus", lootKey = "ZeusUpgrade" },
+        { label = "Aphrodite", lootKey = "AphroditeUpgrade", colorKey = "AphroditeDamage" },
+        { label = "Apollo", lootKey = "ApolloUpgrade", colorKey = "ApolloDamageLight" },
+        { label = "Ares", lootKey = "AresUpgrade", colorKey = "AresDamageLight" },
+        { label = "Demeter", lootKey = "DemeterUpgrade", colorKey = "DemeterDamage" },
+        { label = "Hephaestus", lootKey = "HephaestusUpgrade", colorKey = "HephaestusDamage" },
+        { label = "Hera", lootKey = "HeraUpgrade", colorKey = "HeraDamage" },
+        { label = "Hestia", lootKey = "HestiaUpgrade", colorKey = "HestiaDamageLight" },
+        { label = "Poseidon", lootKey = "PoseidonUpgrade", colorKey = "PoseidonDamage" },
+        { label = "Zeus", lootKey = "ZeusUpgrade", colorKey = "ZeusDamageLight" },
     }
 
     for _, god in ipairs(priorityGods) do
         table.insert(internal.priorityOptions, god.lootKey)
         internal.priorityDisplayValues[god.lootKey] = god.label
+        local inGameColor = god.colorKey and game.Color[god.colorKey] or nil
+        if type(inGameColor) == "table" then
+            internal.priorityValueColors[god.lootKey] = {
+                inGameColor[1] / 255,
+                inGameColor[2] / 255,
+                inGameColor[3] / 255,
+                inGameColor[4] / 255,
+            }
+        end
         table.insert(internal.hubRewardReplacementOptions, god.lootKey)
         internal.hubRewardReplacementDisplayValues[god.lootKey] = god.label
     end
@@ -290,4 +300,3 @@ for _, npcId in ipairs(internal.npcGroups.orderedIds) do
         return a.biome < b.biome
     end)
 end
-

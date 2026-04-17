@@ -122,7 +122,7 @@ end)
 
 local function DrawThessalyMinibossRow(imgui, uiState)
     local dropdownColumnX = 160
-    local rangeColumnX = 340
+    local rangeColumnGap = 20
     local modeValues = { 0, 1, 2, 3 }
     local modeDisplayValues = {
         [0] = "Default",
@@ -139,13 +139,13 @@ local function DrawThessalyMinibossRow(imgui, uiState)
         label = "",
         values = modeValues,
         displayValues = modeDisplayValues,
-        controlWidth = 180,
+        controlWidth = 200,
     })
 
     local mode = uiState.view["ThessalyMiniBossMode"]
     if mode == 1 or mode == 2 then
         imgui.SameLine()
-        imgui.SetCursorPosX(rangeColumnX)
+        imgui.SetCursorPosX(imgui.GetCursorPosX() + rangeColumnGap)
         internal.DrawRangeDropdowns(
             imgui,
             uiState,
@@ -156,11 +156,6 @@ local function DrawThessalyMinibossRow(imgui, uiState)
         )
     end
 
-    lib.widgets.text(imgui,
-        "(Default lets the game decide, Forced selects one miniboss, Disabled suppresses both)",
-        {
-            color = { 0.65, 0.65, 0.65, 1.0 },
-        })
 end
 
 function internal.DrawBiomeTab_Thessaly(imgui, uiState)

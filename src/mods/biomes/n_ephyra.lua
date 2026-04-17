@@ -239,13 +239,8 @@ local function DrawEphyraStoryRow(imgui, uiState)
         label = "",
         values = modeValues,
         displayValues = modeDisplayValues,
-        controlWidth = 140,
+        controlWidth = 150,
     })
-    lib.widgets.text(imgui,
-        "(Default lets the game decide, Forced guarantees Medea when normally eligible, Disabled suppresses it)",
-        {
-            color = { 0.65, 0.65, 0.65, 1.0 },
-        })
 end
 
 local function DrawEphyraMinibossRow(imgui, uiState)
@@ -268,13 +263,8 @@ local function DrawEphyraMinibossRow(imgui, uiState)
         label = "",
         values = modeValues,
         displayValues = modeDisplayValues,
-        controlWidth = 180,
+        controlWidth = 250,
     })
-    lib.widgets.text(imgui,
-        "(Choose which Ephyra miniboss can appear, or disable both)",
-        {
-            color = { 0.65, 0.65, 0.65, 1.0 },
-        })
 end
 
 local function DrawEphyraRewards(imgui, uiState, store)
@@ -285,29 +275,14 @@ local function DrawEphyraRewards(imgui, uiState, store)
         displayValues = internal.hubRewardReplacementDisplayValues,
         controlWidth = 180,
     })
-    lib.widgets.text(imgui,
-        "(Replace the Hermes slot in Ephyra HubRewards with another god or remove it)",
-        {
-            color = { 0.65, 0.65, 0.65, 1.0 },
-        })
 
     imgui.Spacing()
-    lib.widgets.text(imgui, "SubRoomRewards")
+    lib.widgets.text(imgui, "Easy SubRoom Rewards")
     lib.widgets.packedCheckboxList(imgui, uiState, "PackedBannedEphyraSubRoomRewards", store, {})
-    lib.widgets.text(imgui,
-        "(Checked rewards are banned from normal Ephyra subroom reward pools)",
-        {
-            color = { 0.65, 0.65, 0.65, 1.0 },
-        })
 
     imgui.Spacing()
-    lib.widgets.text(imgui, "SubRoomRewardsHard")
+    lib.widgets.text(imgui, "Hard SubRoom Rewards")
     lib.widgets.packedCheckboxList(imgui, uiState, "PackedBannedEphyraSubRoomRewardsHard", store, {})
-    lib.widgets.text(imgui,
-        "(Checked rewards are banned from hard Ephyra subroom reward pools)",
-        {
-            color = { 0.65, 0.65, 0.65, 1.0 },
-        })
 end
 
 function internal.DrawBiomeTab_Ephyra(imgui, uiState, store)

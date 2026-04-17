@@ -18,11 +18,6 @@ RunDirectorBiomeControl_Internal = RunDirectorBiomeControl_Internal or {}
 local internal = RunDirectorBiomeControl_Internal
 internal.packId = PACK_ID
 
-import("mods/data.lua")
-import("mods/ui_settings.lua")
-import("mods/ui_npc.lua")
-import("mods/ui_lean.lua")
-
 public.definition = {
     modpack = PACK_ID,
     id = "BiomeControl",
@@ -47,7 +42,8 @@ internal.regionFilter = config.ViewRegion or internal.REGION_UNDERWORLD
 -- STORAGE
 -- =============================================================================
 
-definition.storage = {
+local function BuildDefinitionStorage()
+    definition.storage = {
     { type = "bool",   configKey = "OnlyAllowForcedEncounters" },
     { type = "bool",   configKey = "IgnoreMaxDepth" },
     { type = "int",    configKey = "NPCSpacing",                     min = 1, max = 12 },
@@ -60,7 +56,7 @@ definition.storage = {
     { type = "string", configKey = "PriorityTrial1" },
     { type = "string", configKey = "PriorityTrial2" },
     { type = "int",    configKey = "ViewRegion" },
-}
+    }
 
 -- Special state fields registered by biome files
 local STORAGE_TYPE_MAP = { checkbox = "bool", stepper = "int", dropdown = "string", int32 = "int" }
@@ -168,22 +164,44 @@ definition.patchPlan = function(plan)
     end
 end
 
+end
+
 local function registerHooks()
     import("mods/logic.lua")
     if internal.RegisterHooks then
         internal.RegisterHooks()
     end
     public.DrawTab = internal.DrawTab
-    public.AfterDrawTab = internal.AfterDrawTab
     public.DrawQuickContent = internal.DrawQuickContent
 end
 
+public.store = nil
+store = nil
+internal.standaloneUi = nil
+
 local function init()
     import_as_fallback(rom.game)
+    import("mods/data.lua")
+    import("mods/ui_settings.lua")
+    import("mods/ui_npc.lua")
+    import("mods/ui_lean.lua")
+    BuildDefinitionStorage()
+    public.store = lib.store.create(config, definition, dataDefaults)
+    store = public.store
     registerHooks()
     if lib.coordinator.isEnabled(store, definition.modpack) then
         lib.mutation.apply(definition, store)
     end
+    internal.standaloneUi = lib.host.standaloneUI(
+        public.definition,
+        store,
+        store.uiState,
+        {
+            getDrawTab = function()
+                return public.DrawTab
+            end,
+        }
+    )
 end
 
 local loader = reload.auto_single()
@@ -192,22 +210,16 @@ modutil.once_loaded.game(function()
     loader.load(init, init)
 end)
 
-local standaloneUi = lib.host.standaloneUI(
-    public.definition,
-    store,
-    store.uiState,
-    {
-        getDrawTab = function()
-            return public.DrawTab
-        end,
-        getAfterDrawTab = function()
-            return public.AfterDrawTab
-        end,
-    }
-)
+---@diagnostic disable-next-line: redundant-parameter
+rom.gui.add_imgui(function()
+    if internal.standaloneUi and internal.standaloneUi.renderWindow then
+        internal.standaloneUi.renderWindow()
+    end
+end)
 
 ---@diagnostic disable-next-line: redundant-parameter
-rom.gui.add_imgui(standaloneUi.renderWindow)
-
----@diagnostic disable-next-line: redundant-parameter
-rom.gui.add_to_menu_bar(standaloneUi.addMenuBar)
+rom.gui.add_to_menu_bar(function()
+    if internal.standaloneUi and internal.standaloneUi.addMenuBar then
+        internal.standaloneUi.addMenuBar()
+    end
+end)

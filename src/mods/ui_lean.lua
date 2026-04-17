@@ -44,6 +44,19 @@ local function BuildIntegerValues(minValue, maxValue)
     return values
 end
 
+local function BuildEncodedModeOptions(def)
+    local values = {}
+    local displayValues = {}
+
+    for index, value in ipairs(def.modeValues or internal.roomModeValues) do
+        local encoded = index - 1
+        values[#values + 1] = encoded
+        displayValues[encoded] = (def.modeDisplayValues or internal.roomModeDisplayValues)[value] or tostring(value)
+    end
+
+    return values, displayValues
+end
+
 local function DrawRangeDropdowns(imgui, uiState, minAlias, maxAlias, minValue, maxValue)
     local values = BuildIntegerValues(minValue, maxValue)
 
@@ -87,13 +100,14 @@ local function DrawRoomRow(imgui, uiState, def)
     local labelColumnX = 36
     local dropdownColumnX = 160
     local rangeColumnX = 310
+    local modeValues, modeDisplayValues = BuildEncodedModeOptions(def)
 
     DrawFixedLabel(imgui, def.label, labelColumnX)
     imgui.SetCursorPosX(dropdownColumnX)
     lib.widgets.dropdown(imgui, uiState, def.modeKey, {
         label = "",
-        values = def.modeValues or internal.roomModeValues,
-        displayValues = def.modeDisplayValues or internal.roomModeDisplayValues,
+        values = modeValues,
+        displayValues = modeDisplayValues,
         controlWidth = 120,
     })
 
@@ -128,7 +142,7 @@ internal.GetRoomDef = GetRoomDef
 
 local function DrawUnderworldTab(imgui, uiState)
     local tabs = BuildRegionTabList(UNDERWORLD_REGION)
-    internal.uiLeanState.underworldTab = lib.ui.verticalTabs(imgui, {
+    internal.uiLeanState.underworldTab = lib.nav.verticalTabs(imgui, {
         id = "BiomeControlUnderworldTabs",
         navWidth = 180,
         tabs = tabs,
@@ -154,7 +168,7 @@ end
 
 local function DrawSurfaceTab(imgui, uiState)
     local tabs = BuildRegionTabList(SURFACE_REGION)
-    internal.uiLeanState.surfaceTab = lib.ui.verticalTabs(imgui, {
+    internal.uiLeanState.surfaceTab = lib.nav.verticalTabs(imgui, {
         id = "BiomeControlSurfaceTabs",
         navWidth = 180,
         tabs = tabs,
@@ -200,9 +214,6 @@ function internal.DrawTab(imgui, uiState)
 
     imgui.EndTabBar()
     return false
-end
-
-function internal.AfterDrawTab()
 end
 
 function internal.DrawQuickContent(imgui)

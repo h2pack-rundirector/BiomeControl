@@ -8,27 +8,31 @@ function internal.DrawSettingsTab(imgui, uiState)
 
     if uiState.view["PrioritizeSpecificRewardEnabled"] == true then
         lib.widgets.dropdown(imgui, uiState, "PriorityBiome1", {
-            label = "Route Biome 1 Priority",
+            label = "Biome 1 Choice ",
             values = internal.priorityOptions,
             displayValues = internal.priorityDisplayValues,
+            valueColors = internal.priorityValueColors,
             controlWidth = 180,
         })
         lib.widgets.dropdown(imgui, uiState, "PriorityBiome2", {
-            label = "Route Biome 2 Priority",
+            label = "Biome 2 Choice",
             values = internal.priorityOptions,
             displayValues = internal.priorityDisplayValues,
+            valueColors = internal.priorityValueColors,
             controlWidth = 180,
         })
         lib.widgets.dropdown(imgui, uiState, "PriorityBiome3", {
-            label = "Route Biome 3 Priority",
+            label = "Biome 3 Choice",
             values = internal.priorityOptions,
             displayValues = internal.priorityDisplayValues,
+            valueColors = internal.priorityValueColors,
             controlWidth = 180,
         })
         lib.widgets.dropdown(imgui, uiState, "PriorityBiome4", {
-            label = "Route Biome 4 Priority",
+            label = "Biome 4 Choice",
             values = internal.priorityOptions,
             displayValues = internal.priorityDisplayValues,
+            valueColors = internal.priorityValueColors,
             controlWidth = 180,
         })
     end
@@ -41,15 +45,17 @@ function internal.DrawSettingsTab(imgui, uiState)
 
     if uiState.view["PrioritizeTrialRewardEnabled"] == true then
         lib.widgets.dropdown(imgui, uiState, "PriorityTrial1", {
-            label = "Trial Priority A",
+            label = "Trial Choice A   ",
             values = internal.priorityOptions,
             displayValues = internal.priorityDisplayValues,
+            valueColors = internal.priorityValueColors,
             controlWidth = 180,
         })
         lib.widgets.dropdown(imgui, uiState, "PriorityTrial2", {
-            label = "Trial Priority B",
+            label = "Trial Choice B   ",
             values = internal.priorityOptions,
             displayValues = internal.priorityDisplayValues,
+            valueColors = internal.priorityValueColors,
             controlWidth = 180,
         })
     end
