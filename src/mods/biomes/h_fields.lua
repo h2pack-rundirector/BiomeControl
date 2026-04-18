@@ -10,11 +10,24 @@ internal.registerStateField({
     label = "Prevent Echo Scam",
 })
 
+internal.registerStateField({
+    type = "checkbox",
+    configKey = "ForceTwoRewardFieldsOpeners",
+    label = "Force 2 Rewards In First Two Rooms",
+})
+
 internal.registerBiomeSpecial("H", {
     kind = "checkbox",
     configKey = "PreventEchoScam",
     label = "Prevent Echo Scam",
     helpText = "(Prevent miniboss from spawning in same depth as Echo, which can prevent it from spawning at all)",
+})
+
+internal.registerBiomeSpecial("H", {
+    kind = "checkbox",
+    configKey = "ForceTwoRewardFieldsOpeners",
+    label = "Force 2 Rewards In First Two Rooms",
+    helpText = "(Force normal H combat encounters to offer exactly 2 rewards at biome depth 1 and 2; vanilla 3-reward promotion resumes after depth 2)",
 })
 
 internal.registerPatchBuilder(function(plan, read)
@@ -43,9 +56,30 @@ function internal.DrawBiomeTab_Fields(imgui, uiState)
     lib.widgets.checkbox(imgui, uiState, "PreventEchoScam", {
         label = "Prevent Echo Scam",
     })
-    lib.widgets.text(imgui,
-        "(Prevent miniboss from spawning in same depth as Echo, which can prevent it from spawning at all)",
-        {
-            color = { 0.65, 0.65, 0.65, 1.0 },
-        })
+
+    imgui.Spacing()
+    lib.widgets.checkbox(imgui, uiState, "ForceTwoRewardFieldsOpeners", {
+        label = "Force 2-2 Fields",
+    })
+end
+
+function internal.RegisterFieldsHooks()
+    modutil.mod.Path.Wrap("SelectFieldsDoorCageCount", function(base, run, room)
+        if not internal.IsEnabled() then
+            return base(run, room)
+        end
+
+        if not internal.BiomeControlRead("ForceTwoRewardFieldsOpeners") then
+            return base(run, room)
+        end
+
+        local biomeDepth = run and tonumber(run.BiomeDepthCache) or 0
+        local roomName = room and room.Name or nil
+
+        if biomeDepth <= 2 and type(roomName) == "string" and roomName:match("^H_Combat%d+$") then
+            return room.MinDoorCageRewards or 2
+        end
+
+        return base(run, room)
+    end)
 end

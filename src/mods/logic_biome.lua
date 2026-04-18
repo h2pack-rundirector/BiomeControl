@@ -231,4 +231,8 @@ function internal.RegisterBiomeHooks()
             room.Encounter.LootBName = prioB
         end
     end)
+
+    if internal.RegisterFieldsHooks then
+        internal.RegisterFieldsHooks()
+    end
 end

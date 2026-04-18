@@ -3,48 +3,6 @@ return {
     DebugMode = false,
 
     ViewRegion = 1,
-    ModeStoryArachne = 0,
-    ModeTrialErebus = 0,
-    ModeFountainErebus = 0,
-    ModeShopErebus = 0,
-    ModeMiniBossTreant = 0,
-    ModeMiniBossFogEmitter = 0,
-    ModeMiniBossAssassin = 0,
-    ModeStoryNarcissus = 0,
-    ModeTrialOceanus = 0,
-    ModeFountainOceanus = 0,
-    ModeShopOceanus = 0,
-    ModeMiniBossWaterUnit = 0,
-    ModeMiniBossCrawler = 0,
-    ModeMiniBossJellyfish = 0,
-    ModeMiniBossVampire = 0,
-    ModeMiniBossLamia = 0,
-    ModeMiniBossRatCatcher = 0,
-    ModeMiniBossGoldElemental = 0,
-    ModeStoryCirce = 0,
-    ModeTrialThessaly = 0,
-    ModeFountainThessaly = 0,
-    ModeShopThessaly = 0,
-    ModeStoryDionysus = 0,
-    ModeFountainOlympus = 0,
-    ModeShopOlympus = 0,
-    ModeMiniBossTalos = 0,
-    ModeMiniBossDragon = 0,
-    EphyraStoryMode = 0,
-    EphyraMiniBossMode = 0,
-    ThessalyMiniBossMode = 0,
-    ModeNPCArtemisErebus = 0,
-    ModeNPCNemesisErebus = 0,
-    ModeNPCArtemisOceanus = 0,
-    ModeNPCNemesisOceanus = 0,
-    ModeNPCNemesisFields = 0,
-    ModeNPCArtemisEphyra = 0,
-    ModeNPCHeraclesEphyra = 0,
-    ModeNPCHeraclesThessaly = 0,
-    ModeNPCIcarusThessaly = 0,
-    ModeNPCHeraclesOlympus = 0,
-    ModeNPCAthenaOlympus = 0,
-    ModeNPCIcarusOlympus = 0,
 
     OnlyAllowForcedEncounters = false,
     IgnoreMaxDepth = false,
@@ -59,115 +17,183 @@ return {
     PriorityTrial1 = "",
     PriorityTrial2 = "",
 
+    -- Underworld: Erebus
+    ModeStoryArachne = 0,
     PackedStoryArachneMin = 4,
     PackedStoryArachneMax = 8,
-    PackedStoryNarcissusMin = 3,
-    PackedStoryNarcissusMax = 6,
-    PackedStoryCirceMin = 4,
-    PackedStoryCirceMax = 5,
-    PackedStoryDionysusMin = 3,
-    PackedStoryDionysusMax = 7,
 
+    ModeTrialErebus = 0,
     PackedTrialErebusMin = 6,
     PackedTrialErebusMax = 10,
-    PackedTrialOceanusMin = 3,
-    PackedTrialOceanusMax = 7,
-    PackedTrialThessalyMin = 2,
-    PackedTrialThessalyMax = 6,
 
+    ModeFountainErebus = 0,
     PackedFountainErebusMin = 4,
     PackedFountainErebusMax = 8,
-    PackedFountainOceanusMin = 4,
-    PackedFountainOceanusMax = 6,
-    PackedFountainThessalyMin = 3,
-    PackedFountainThessalyMax = 5,
-    PackedFountainOlympusMin = 4,
-    PackedFountainOlympusMax = 7,
 
+    ModeShopErebus = 0,
     PackedShopErebusMin = 4,
     PackedShopErebusMax = 6,
-    PackedShopOceanusMin = 3,
-    PackedShopOceanusMax = 6,
-    PackedShopThessalyMin = 4,
-    PackedShopThessalyMax = 5,
-    PackedShopOlympusMin = 5,
-    PackedShopOlympusMax = 7,
 
+    ModeMiniBossTreant = 0,
     PackedMiniBossTreantMin = 4,
     PackedMiniBossTreantMax = 6,
+
+    ModeMiniBossFogEmitter = 0,
     PackedMiniBossFogEmitterMin = 4,
     PackedMiniBossFogEmitterMax = 6,
+
+    ModeMiniBossAssassin = 0,
     PackedMiniBossAssassinMin = 4,
     PackedMiniBossAssassinMax = 6,
-    PackedMiniBossWaterUnitMin = 4,
-    PackedMiniBossWaterUnitMax = 7,
-    PackedMiniBossCrawlerMin = 4,
-    PackedMiniBossCrawlerMax = 7,
-    PackedMiniBossJellyfishMin = 4,
-    PackedMiniBossJellyfishMax = 7,
-    PackedMiniBossVampireMin = 2,
-    PackedMiniBossVampireMax = 4,
-    PackedMiniBossLamiaMin = 2,
-    PackedMiniBossLamiaMax = 4,
-    PackedMiniBossRatCatcherMin = 3,
-    PackedMiniBossRatCatcherMax = 7,
-    PackedMiniBossGoldElementalMin = 3,
-    PackedMiniBossGoldElementalMax = 7,
-    PackedMiniBossTalosMin = 4,
-    PackedMiniBossTalosMax = 7,
-    PackedMiniBossDragonMin = 4,
-    PackedMiniBossDragonMax = 7,
 
+    ModeNPCArtemisErebus = 0,
     PackedNPCArtemisErebusMin = 4,
     PackedNPCArtemisErebusMax = 10,
-    PackedNPCArtemisOceanusMin = 4,
-    PackedNPCArtemisOceanusMax = 10,
-    PackedNPCArtemisEphyraMin = 4,
-    PackedNPCArtemisEphyraMax = 10,
 
+    ModeNPCNemesisErebus = 0,
     PackedNPCNemesisErebusMin = 4,
     PackedNPCNemesisErebusMax = 10,
+
+    -- Underworld: Oceanus
+    ModeStoryNarcissus = 0,
+    PackedStoryNarcissusMin = 3,
+    PackedStoryNarcissusMax = 6,
+
+    ModeTrialOceanus = 0,
+    PackedTrialOceanusMin = 3,
+    PackedTrialOceanusMax = 7,
+
+    ModeFountainOceanus = 0,
+    PackedFountainOceanusMin = 4,
+    PackedFountainOceanusMax = 6,
+
+    ModeShopOceanus = 0,
+    PackedShopOceanusMin = 3,
+    PackedShopOceanusMax = 6,
+
+    ModeMiniBossWaterUnit = 0,
+    PackedMiniBossWaterUnitMin = 4,
+    PackedMiniBossWaterUnitMax = 7,
+
+    ModeMiniBossCrawler = 0,
+    PackedMiniBossCrawlerMin = 4,
+    PackedMiniBossCrawlerMax = 7,
+
+    ModeMiniBossJellyfish = 0,
+    PackedMiniBossJellyfishMin = 4,
+    PackedMiniBossJellyfishMax = 7,
+
+    ModeNPCArtemisOceanus = 0,
+    PackedNPCArtemisOceanusMin = 4,
+    PackedNPCArtemisOceanusMax = 10,
+
+    ModeNPCNemesisOceanus = 0,
     PackedNPCNemesisOceanusMin = 4,
     PackedNPCNemesisOceanusMax = 10,
+
+    -- Underworld: Fields
+    ModeMiniBossVampire = 0,
+    PackedMiniBossVampireMin = 2,
+    PackedMiniBossVampireMax = 4,
+
+    ModeMiniBossLamia = 0,
+    PackedMiniBossLamiaMin = 2,
+    PackedMiniBossLamiaMax = 4,
+
+    ModeNPCNemesisFields = 0,
     PackedNPCNemesisFieldsMin = 4,
     PackedNPCNemesisFieldsMax = 10,
+
+    PreventEchoScam = false,
+    ForceTwoRewardFieldsOpeners = false,
+
+    -- Underworld: Tartarus
+    ModeMiniBossRatCatcher = 0,
+    PackedMiniBossRatCatcherMin = 3,
+    PackedMiniBossRatCatcherMax = 7,
+
+    ModeMiniBossGoldElemental = 0,
+    PackedMiniBossGoldElementalMin = 3,
+    PackedMiniBossGoldElementalMax = 7,
+
+    ModeNPCNemesisTartarus = 0,
     PackedNPCNemesisTartarusMin = 4,
     PackedNPCNemesisTartarusMax = 10,
 
+    -- Surface: Ephyra
+    EphyraStoryMode = 0,
+    ModeNPCArtemisEphyra = 0,
+    PackedNPCArtemisEphyraMin = 4,
+    PackedNPCArtemisEphyraMax = 10,
+
+    ModeNPCHeraclesEphyra = 0,
     PackedNPCHeraclesEphyraMin = 0,
     PackedNPCHeraclesEphyraMax = 10,
-    PackedNPCHeraclesThessalyMin = 0,
-    PackedNPCHeraclesThessalyMax = 10,
-    PackedNPCHeraclesOlympusMin = 0,
-    PackedNPCHeraclesOlympusMax = 10,
 
-    PackedNPCAthenaOlympusMin = 4,
-    PackedNPCAthenaOlympusMax = 8,
-
-    PackedNPCIcarusThessalyMin = 3,
-    PackedNPCIcarusThessalyMax = 8,
-    PackedNPCIcarusOlympusMin = 3,
-    PackedNPCIcarusOlympusMax = 8,
-
-
-    --Ephyra
+    EphyraMiniBossMode = 0,
     ReplaceHermesInEphyra = "",
     PackedBannedEphyraSubRoomRewards = 0,
     PackedBannedEphyraSubRoomRewardsHard = 0,
 
+    -- Surface: Thessaly
+    ModeStoryCirce = 0,
+    PackedStoryCirceMin = 4,
+    PackedStoryCirceMax = 5,
 
-    --Thessaly
+    ModeTrialThessaly = 0,
+    PackedTrialThessalyMin = 2,
+    PackedTrialThessalyMax = 6,
+
+    ModeFountainThessaly = 0,
+    PackedFountainThessalyMin = 3,
+    PackedFountainThessalyMax = 5,
+
+    ModeShopThessaly = 0,
+    PackedShopThessalyMin = 4,
+    PackedShopThessalyMax = 5,
+
+    ThessalyMiniBossMode = 0,
     PackedForcedThessalyMiniBossMin = 3,
     PackedForcedThessalyMiniBossMax = 5,
 
-    --Olympus
+    ModeNPCHeraclesThessaly = 0,
+    PackedNPCHeraclesThessalyMin = 0,
+    PackedNPCHeraclesThessalyMax = 10,
 
-    --Summit
+    ModeNPCIcarusThessaly = 0,
+    PackedNPCIcarusThessalyMin = 3,
+    PackedNPCIcarusThessalyMax = 8,
 
-    --Erebus
+    -- Surface: Olympus
+    ModeStoryDionysus = 0,
+    PackedStoryDionysusMin = 3,
+    PackedStoryDionysusMax = 7,
 
-    --Oceanus
+    ModeFountainOlympus = 0,
+    PackedFountainOlympusMin = 4,
+    PackedFountainOlympusMax = 7,
 
-    PreventEchoScam = false,
+    ModeShopOlympus = 0,
+    PackedShopOlympusMin = 5,
+    PackedShopOlympusMax = 7,
 
+    ModeMiniBossTalos = 0,
+    PackedMiniBossTalosMin = 4,
+    PackedMiniBossTalosMax = 7,
+
+    ModeMiniBossDragon = 0,
+    PackedMiniBossDragonMin = 4,
+    PackedMiniBossDragonMax = 7,
+
+    ModeNPCHeraclesOlympus = 0,
+    PackedNPCHeraclesOlympusMin = 0,
+    PackedNPCHeraclesOlympusMax = 10,
+
+    ModeNPCAthenaOlympus = 0,
+    PackedNPCAthenaOlympusMin = 4,
+    PackedNPCAthenaOlympusMax = 8,
+
+    ModeNPCIcarusOlympus = 0,
+    PackedNPCIcarusOlympusMin = 3,
+    PackedNPCIcarusOlympusMax = 8,
 }

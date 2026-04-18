@@ -182,10 +182,15 @@ internal.standaloneUi = nil
 local function init()
     import_as_fallback(rom.game)
     import("mods/data.lua")
+    import("mods/hash_groups.lua")
     import("mods/ui_settings.lua")
     import("mods/ui_npc.lua")
     import("mods/ui_lean.lua")
     BuildDefinitionStorage()
+    lib.storage.validate(definition.storage, definition.id)
+    if internal.BuildHashGroups then
+        definition.hashGroups = internal.BuildHashGroups(definition.storage)
+    end
     public.store = lib.store.create(config, definition, dataDefaults)
     store = public.store
     registerHooks()
