@@ -253,12 +253,7 @@ function internal.DrawTab(imgui, uiState)
 end
 
 function internal.DrawQuickContent(imgui, uiState)
-    lib.widgets.text(imgui, "Biome Control")
-    lib.widgets.text(imgui, "Lean UI shell active", {
-        color = { 0.65, 0.65, 0.65, 1.0 },
-    })
-    imgui.Spacing()
-    lib.widgets.confirmButton(imgui, "biome_control_quick_reset_all", "Reset All Controls", {
+    lib.widgets.confirmButton(imgui, "biome_control_quick_reset_all", "Reset To Default", {
         confirmLabel = "Confirm Reset All",
         onConfirm = function()
             internal.ResetAllControls(uiState)
