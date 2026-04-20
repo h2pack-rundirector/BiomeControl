@@ -8,13 +8,30 @@ game = rom.game
 modutil = mods["SGG_Modding-ModUtil"]
 local chalk = mods["SGG_Modding-Chalk"]
 local reload = mods["SGG_Modding-ReLoad"]
+---@type AdamantModpackLib
 lib = mods["adamant-ModpackLib"]
 
 local dataDefaults = import("config.lua")
 local config = chalk.auto("config.lua")
 
 local PACK_ID = "run-director"
+---@class RunDirectorBiomeControlInternal
+---@field packId string|nil
+---@field definition ModuleDefinition|nil
+---@field store ManagedStore|nil
+---@field standaloneUi StandaloneRuntime|nil
+---@field BuildDefinitionStorage fun()|nil
+---@field BuildHashGroups fun(storage: StorageSchema|nil): table|nil
+---@field RegisterHooks fun()|nil
+---@field DrawTab fun(imgui: table, session: AuthorSession)|nil
+---@field DrawQuickContent fun(imgui: table, session: AuthorSession)|nil
+---@field DEFAULT_FIELD_MEDIUM number|nil
+---@field REGION_UNDERWORLD integer|nil
+---@field REGION_SURFACE integer|nil
+---@field REGION_OPTIONS table|nil
+---@field regionFilter integer|nil
 RunDirectorBiomeControl_Internal = RunDirectorBiomeControl_Internal or {}
+---@type RunDirectorBiomeControlInternal
 local internal = RunDirectorBiomeControl_Internal
 internal.packId = PACK_ID
 
