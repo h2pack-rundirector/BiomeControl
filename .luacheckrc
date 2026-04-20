@@ -10,7 +10,6 @@ globals = {
     "reload",
     "_PLUGIN",
     "lib",
-    "store",
     "RunDirectorBiomeControl_Internal",
     "CurrentRun"
     

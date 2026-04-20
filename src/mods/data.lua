@@ -150,15 +150,15 @@ end
 
 do
     local priorityGods = {
-        { label = "Aphrodite", lootKey = "AphroditeUpgrade", colorKey = "AphroditeDamage" },
-        { label = "Apollo", lootKey = "ApolloUpgrade", colorKey = "ApolloDamageLight" },
-        { label = "Ares", lootKey = "AresUpgrade", colorKey = "AresDamageLight" },
-        { label = "Demeter", lootKey = "DemeterUpgrade", colorKey = "DemeterDamage" },
-        { label = "Hephaestus", lootKey = "HephaestusUpgrade", colorKey = "HephaestusDamage" },
-        { label = "Hera", lootKey = "HeraUpgrade", colorKey = "HeraDamage" },
-        { label = "Hestia", lootKey = "HestiaUpgrade", colorKey = "HestiaDamageLight" },
-        { label = "Poseidon", lootKey = "PoseidonUpgrade", colorKey = "PoseidonDamage" },
-        { label = "Zeus", lootKey = "ZeusUpgrade", colorKey = "ZeusDamageLight" },
+        { label = "Aphrodite",  lootKey = "AphroditeUpgrade",  colorKey = "AphroditeVoice" },
+        { label = "Apollo",     lootKey = "ApolloUpgrade",     colorKey = "ApolloVoice" },
+        { label = "Ares",       lootKey = "AresUpgrade",       colorKey = "AresVoice" },
+        { label = "Demeter",    lootKey = "DemeterUpgrade",    colorKey = "DemeterVoice" },
+        { label = "Hephaestus", lootKey = "HephaestusUpgrade", colorKey = "HephaestusVoice" },
+        { label = "Hera",       lootKey = "HeraUpgrade",       colorKey = "HeraDamage" },
+        { label = "Hestia",     lootKey = "HestiaUpgrade",     colorKey = "HestiaVoice" },
+        { label = "Poseidon",   lootKey = "PoseidonUpgrade",   colorKey = "PoseidonVoice" },
+        { label = "Zeus",       lootKey = "ZeusUpgrade",       colorKey = "ZeusVoice" },
     }
 
     for _, god in ipairs(priorityGods) do
@@ -299,4 +299,126 @@ for _, npcId in ipairs(internal.npcGroups.orderedIds) do
     table.sort(group.definitions, function(a, b)
         return a.biome < b.biome
     end)
+end
+
+function internal.BuildDefinitionStorage()
+    public.definition.storage = {
+        { type = "bool",   configKey = "OnlyAllowForcedEncounters" },
+        { type = "bool",   configKey = "IgnoreMaxDepth" },
+        { type = "int",    configKey = "NPCSpacing",                     min = 1, max = 12 },
+        { type = "bool",   configKey = "PrioritizeSpecificRewardEnabled" },
+        { type = "string", configKey = "PriorityBiome1" },
+        { type = "string", configKey = "PriorityBiome2" },
+        { type = "string", configKey = "PriorityBiome3" },
+        { type = "string", configKey = "PriorityBiome4" },
+        { type = "bool",   configKey = "PrioritizeTrialRewardEnabled" },
+        { type = "string", configKey = "PriorityTrial1" },
+        { type = "string", configKey = "PriorityTrial2" },
+        { type = "int",    configKey = "ViewRegion" },
+    }
+
+    local storageTypeMap = { checkbox = "bool", stepper = "int", dropdown = "string", int32 = "int" }
+    local packedRewardFields = {}
+
+    for _, rewards in pairs(internal.biomeRewards or {}) do
+        for _, reward in ipairs(rewards) do
+            if reward.kind == "packedCheckboxes" and type(reward.configKey) == "string" and reward.configKey ~= "" then
+                packedRewardFields[reward.configKey] = reward
+            end
+        end
+    end
+
+    for _, field in ipairs(internal.specialStateFields) do
+        if not packedRewardFields[field.configKey] then
+            local storageType = storageTypeMap[field.type] or field.type
+            local default = field.default
+            if default == nil then
+                if storageType == "bool" then
+                    default = false
+                elseif storageType == "string" then
+                    default = ""
+                else
+                    default = field.min or 0
+                end
+            end
+            table.insert(public.definition.storage, {
+                type = storageType,
+                configKey = field.configKey,
+                default = default,
+                min = field.min,
+                max = field.max,
+            })
+        end
+    end
+
+    for configKey, reward in pairs(packedRewardFields) do
+        local bits = {}
+        for _, option in ipairs(reward.options or {}) do
+            bits[#bits + 1] = {
+                alias = configKey .. "_" .. tostring(option.name or option.label or option.bit),
+                label = option.label or tostring(option.name or option.bit),
+                type = "bool",
+                offset = option.bit,
+                width = 1,
+                default = false,
+            }
+        end
+        table.insert(public.definition.storage, {
+            type = "packedInt",
+            configKey = configKey,
+            alias = configKey,
+            default = 0,
+            bits = bits,
+        })
+    end
+
+    for _, field in ipairs(internal.specialRangeFields) do
+        table.insert(public.definition.storage, {
+            type = "int",
+            configKey = field.configKeyMin,
+            default = field.min,
+            min = field.min,
+            max = field.max,
+        })
+        table.insert(public.definition.storage, {
+            type = "int",
+            configKey = field.configKeyMax,
+            default = field.max,
+            min = field.min,
+            max = field.max,
+        })
+    end
+
+    for _, field in ipairs(internal.modeStorageFields) do
+        table.insert(public.definition.storage, field)
+    end
+
+    local function addDepthStorageNodes(definitions)
+        local seen = {}
+        for _, def in ipairs(definitions) do
+            if not seen[def.configKeyMin] then
+                seen[def.configKeyMin] = true
+                table.insert(public.definition.storage, {
+                    type = "int",
+                    configKey = def.configKeyMin,
+                    default = def.minDefault,
+                    min = def.minDefault,
+                    max = def.maxDefault,
+                })
+            end
+            if not seen[def.configKeyMax] then
+                seen[def.configKeyMax] = true
+                table.insert(public.definition.storage, {
+                    type = "int",
+                    configKey = def.configKeyMax,
+                    default = def.maxDefault,
+                    min = def.minDefault,
+                    max = def.maxDefault,
+                })
+            end
+        end
+    end
+
+    addDepthStorageNodes(internal.roomDefinitions)
+    addDepthStorageNodes(internal.npcDefinitions)
 end

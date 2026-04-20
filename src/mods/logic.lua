@@ -1,11 +1,11 @@
 local internal = RunDirectorBiomeControl_Internal
 
 local function Read(key)
-    return store.read(key)
+    return internal.store.read(key)
 end
 
 local function IsEnabled()
-    return lib.isModuleEnabled(store, internal.packId)
+    return lib.isModuleEnabled(internal.store, internal.packId)
 end
 
 internal.BiomeControlRead = Read
@@ -40,8 +40,14 @@ function internal.GetRunState()
     return state
 end
 
-import("mods/logic_biome.lua")
-import("mods/logic_npc.lua")
+import("mods/logic/logic_biome.lua")
+import("mods/logic/logic_npc.lua")
+
+public.definition.patchPlan = function(plan)
+    if internal.BuildPatchPlan then
+        internal.BuildPatchPlan(plan)
+    end
+end
 
 function internal.BuildPatchPlan(plan)
     if internal.BuildBiomePatchPlan then
