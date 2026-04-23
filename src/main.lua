@@ -88,20 +88,22 @@ end
 
 local loader = reload.auto_single()
 
+local function registerGui()
+    ---@diagnostic disable-next-line: redundant-parameter
+    rom.gui.add_imgui(function()
+        if internal.standaloneUi and internal.standaloneUi.renderWindow then
+            internal.standaloneUi.renderWindow()
+        end
+    end)
+
+    ---@diagnostic disable-next-line: redundant-parameter
+    rom.gui.add_to_menu_bar(function()
+        if internal.standaloneUi and internal.standaloneUi.addMenuBar then
+            internal.standaloneUi.addMenuBar()
+        end
+    end)
+end
+
 modutil.once_loaded.game(function()
-    loader.load(nil, init)
-end)
-
----@diagnostic disable-next-line: redundant-parameter
-rom.gui.add_imgui(function()
-    if internal.standaloneUi and internal.standaloneUi.renderWindow then
-        internal.standaloneUi.renderWindow()
-    end
-end)
-
----@diagnostic disable-next-line: redundant-parameter
-rom.gui.add_to_menu_bar(function()
-    if internal.standaloneUi and internal.standaloneUi.addMenuBar then
-        internal.standaloneUi.addMenuBar()
-    end
+    loader.load(registerGui, init)
 end)
