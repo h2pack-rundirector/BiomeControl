@@ -15,7 +15,7 @@ end
 internal.DrawSectionHeading = DrawSectionHeading
 
 function internal.ResetAllControls(session)
-    local changed = lib.resetStorageToDefaults(definition.storage, session, {
+    local changed = lib.resetStorageToDefaults(internal.definition.storage, session, {
         exclude = { ViewRegion = true },
     })
     return changed

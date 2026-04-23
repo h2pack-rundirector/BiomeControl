@@ -5,7 +5,7 @@ local function Read(key)
 end
 
 local function IsEnabled()
-    return lib.isModuleEnabled(internal.store, internal.packId)
+    return lib.isModuleEnabled(internal.store, internal.definition.modpack)
 end
 
 internal.BiomeControlRead = Read
@@ -44,7 +44,7 @@ import("mods/logic/logic_biome.lua")
 import("mods/logic/logic_npc.lua")
 import("mods/logic/logic_dream.lua")
 
-public.definition.patchPlan = function(plan)
+internal.definition.patchPlan = function(plan)
     if internal.BuildPatchPlan then
         internal.BuildPatchPlan(plan)
     end

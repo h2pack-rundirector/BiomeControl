@@ -62,6 +62,46 @@ local function filterRewardStore(list, packedValue, options)
     return newList
 end
 
+local function forEachRewardStoreTarget(storeKey, callback)
+    local applied = false
+
+    if RewardStoreData and type(RewardStoreData[storeKey]) == "table" then
+        callback(RewardStoreData, "RewardStoreData")
+        applied = true
+    end
+
+    if CurrentRun and CurrentRun.RewardStores and type(CurrentRun.RewardStores[storeKey]) == "table" then
+        callback(CurrentRun.RewardStores, "CurrentRun.RewardStores")
+        applied = true
+    end
+
+    return applied
+end
+
+local function findRewardEntry(store, storeKey, rewardName)
+    local list = store and store[storeKey]
+    if type(list) ~= "table" then
+        return nil
+    end
+
+    for _, entry in ipairs(list) do
+        if entry.Name == rewardName then
+            return entry
+        end
+    end
+    return nil
+end
+
+local function copyRewardEntry(entry, replacementName)
+    local copy = {}
+    for key, value in pairs(entry) do
+        copy[key] = value
+    end
+    copy.Name = replacementName
+    copy.GameStateRequirements = nil
+    return copy
+end
+
 local function appendImpossibleRequirement(plan, roomKey)
     local room = RoomData and RoomData[roomKey]
     if not room then return end
@@ -141,27 +181,18 @@ internal.registerPatchBuilder(function(plan, read, log)
         return
     end
 
-    local hermesHubReward = nil
-    for _, entry in ipairs(LootData.HubRewards or {}) do
-        if entry.Name == "HermesUpgrade" then
-            hermesHubReward = entry
-            break
+    local applied = false
+    forEachRewardStoreTarget("HubRewards", function(store)
+        local hermesHubReward = findRewardEntry(store, "HubRewards", "HermesUpgrade")
+        if hermesHubReward then
+            plan:setElement(store, "HubRewards", hermesHubReward, copyRewardEntry(hermesHubReward, replacement))
+            applied = true
         end
-    end
+    end)
 
-    if hermesHubReward == nil then
-        return
+    if applied then
+        log("Replaced Hermes in Ephyra HubRewards with %s", replacement)
     end
-
-    local copy = {}
-    for key, value in pairs(hermesHubReward) do
-        copy[key] = value
-    end
-    copy.Name = replacement
-    copy.GameStateRequirements = nil
-    plan:setElement(LootData, "HubRewards", hermesHubReward, copy)
-
-    log("Replaced Hermes in Ephyra HubRewards with %s", replacement)
 end)
 
 internal.registerPatchBuilder(function(plan, read, log)
@@ -209,14 +240,20 @@ internal.registerPatchBuilder(function(plan, read, log)
     local packedNormal = read("PackedBannedEphyraSubRoomRewards") or 0
     local packedHard = read("PackedBannedEphyraSubRoomRewardsHard") or 0
 
-    plan:transform(LootData, "SubRoomRewards", function(list)
-        return filterRewardStore(list, packedNormal, subRoomRewardOptions)
+    local appliedNormal = forEachRewardStoreTarget("SubRoomRewards", function(store)
+        plan:transform(store, "SubRoomRewards", function(list)
+            return filterRewardStore(list, packedNormal, subRoomRewardOptions)
+        end)
     end)
-    plan:transform(LootData, "SubRoomRewardsHard", function(list)
-        return filterRewardStore(list, packedHard, subRoomRewardsHardOptions)
+    local appliedHard = forEachRewardStoreTarget("SubRoomRewardsHard", function(store)
+        plan:transform(store, "SubRoomRewardsHard", function(list)
+            return filterRewardStore(list, packedHard, subRoomRewardsHardOptions)
+        end)
     end)
 
-    log("Applied Ephyra subroom reward bans")
+    if appliedNormal or appliedHard then
+        log("Applied Ephyra subroom reward bans")
+    end
 end)
 
 local function DrawEphyraStoryRow(imgui, session)

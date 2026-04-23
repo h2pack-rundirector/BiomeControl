@@ -317,7 +317,7 @@ for _, npcId in ipairs(internal.npcGroups.orderedIds) do
 end
 
 function internal.BuildDefinitionStorage()
-    public.definition.storage = {
+    internal.definition.storage = {
         { type = "bool",   configKey = "OnlyAllowForcedEncounters" },
         { type = "bool",   configKey = "IgnoreMaxDepth" },
         { type = "int",    configKey = "NPCSpacing",                     min = 1, max = 12 },
@@ -361,7 +361,7 @@ function internal.BuildDefinitionStorage()
                     default = field.min or 0
                 end
             end
-            table.insert(public.definition.storage, {
+            table.insert(internal.definition.storage, {
                 type = storageType,
                 configKey = field.configKey,
                 default = default,
@@ -383,7 +383,7 @@ function internal.BuildDefinitionStorage()
                 default = false,
             }
         end
-        table.insert(public.definition.storage, {
+        table.insert(internal.definition.storage, {
             type = "packedInt",
             configKey = configKey,
             alias = configKey,
@@ -393,14 +393,14 @@ function internal.BuildDefinitionStorage()
     end
 
     for _, field in ipairs(internal.specialRangeFields) do
-        table.insert(public.definition.storage, {
+        table.insert(internal.definition.storage, {
             type = "int",
             configKey = field.configKeyMin,
             default = field.min,
             min = field.min,
             max = field.max,
         })
-        table.insert(public.definition.storage, {
+        table.insert(internal.definition.storage, {
             type = "int",
             configKey = field.configKeyMax,
             default = field.max,
@@ -410,7 +410,7 @@ function internal.BuildDefinitionStorage()
     end
 
     for _, field in ipairs(internal.modeStorageFields) do
-        table.insert(public.definition.storage, field)
+        table.insert(internal.definition.storage, field)
     end
 
     local function addDepthStorageNodes(definitions)
@@ -418,7 +418,7 @@ function internal.BuildDefinitionStorage()
         for _, def in ipairs(definitions) do
             if not seen[def.configKeyMin] then
                 seen[def.configKeyMin] = true
-                table.insert(public.definition.storage, {
+                table.insert(internal.definition.storage, {
                     type = "int",
                     configKey = def.configKeyMin,
                     default = def.minDefault,
@@ -428,7 +428,7 @@ function internal.BuildDefinitionStorage()
             end
             if not seen[def.configKeyMax] then
                 seen[def.configKeyMax] = true
-                table.insert(public.definition.storage, {
+                table.insert(internal.definition.storage, {
                     type = "int",
                     configKey = def.configKeyMax,
                     default = def.maxDefault,

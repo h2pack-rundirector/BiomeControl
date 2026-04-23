@@ -16,7 +16,6 @@ local config = chalk.auto("config.lua")
 
 local PACK_ID = "run-director"
 ---@class RunDirectorBiomeControlInternal
----@field packId string|nil
 ---@field definition ModuleDefinition|nil
 ---@field store ManagedStore|nil
 ---@field standaloneUi StandaloneRuntime|nil
@@ -33,7 +32,6 @@ local PACK_ID = "run-director"
 RunDirectorBiomeControl_Internal = RunDirectorBiomeControl_Internal or {}
 ---@type RunDirectorBiomeControlInternal
 local internal = RunDirectorBiomeControl_Internal
-internal.packId = PACK_ID
 
 public.definition = {
     modpack = PACK_ID,
@@ -43,7 +41,6 @@ public.definition = {
     default = dataDefaults.Enabled,
     affectsRunData = true,
 }
-definition = public.definition
 internal.definition = public.definition
 
 internal.DEFAULT_FIELD_MEDIUM = 0.4
@@ -69,16 +66,16 @@ local function init()
 
     internal.BuildDefinitionStorage()
 
-    store, session = lib.createStore(config, public.definition, dataDefaults)
+    store, session = lib.createStore(config, internal.definition, dataDefaults)
     internal.store = store
     RunDirectorBiomeControl_Public = public
 
     if internal.BuildHashGroups then
-        public.definition.hashGroups = internal.BuildHashGroups(public.definition.storage)
+        internal.definition.hashGroups = internal.BuildHashGroups(internal.definition.storage)
     end
 
     public.host = lib.createModuleHost({
-        definition = public.definition,
+        definition = internal.definition,
         store = store,
         session = session,
         hookOwner = internal,

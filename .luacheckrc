@@ -27,8 +27,7 @@ read_globals = {
     "NamedRequirementsData",
     "EncounterData",
     "IsGameStateEligible",
-    "LootData",
-    "definition",
+    "RewardStoreData",
     "Contains",
     "IsEncounterEligible"
 }
