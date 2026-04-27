@@ -215,6 +215,7 @@ function ResetBiomeControlHarness(opts)
             definition = definition,
             store = store,
             session = session,
+            drawTab = function() end,
             hookOwner = internal,
             registerHooks = internal.RegisterHooks,
         })
