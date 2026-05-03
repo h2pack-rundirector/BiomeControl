@@ -1,5 +1,6 @@
 local internal = RunDirectorBiomeControl_Internal
 local MODULE_ID = "BiomeControl"
+local GOD_AVAILABILITY_INTEGRATION = "run-director.god-availability"
 
 local roomDefinitions = internal.roomDefinitions
 local roomLookup = internal.roomLookup
@@ -28,18 +29,39 @@ local function GetDefinitionMode(def)
     return internal.GetModeValue(Read, def)
 end
 
+local function IsPriorityLootAvailable(lootKey)
+    if lootKey == "" then
+        return true
+    end
+
+    local godKey = internal.priorityGodByLootKey and internal.priorityGodByLootKey[lootKey] or nil
+    if not godKey then
+        return true
+    end
+
+    return lib.integrations.invoke(GOD_AVAILABILITY_INTEGRATION, "isAvailable", true, godKey) ~= false
+end
+
+local function AvailablePriorityKey(lootKey)
+    lootKey = lootKey or ""
+    if lootKey ~= "" and not IsPriorityLootAvailable(lootKey) then
+        return ""
+    end
+    return lootKey
+end
+
 local function PriorityKeyForBiome(biomeIndex)
     biomeIndex = math.max((biomeIndex or 0) - 1, 0)
-    if biomeIndex == 0 then return Read("PriorityBiome1") or "" end
-    if biomeIndex == 1 then return Read("PriorityBiome2") or "" end
-    if biomeIndex == 2 then return Read("PriorityBiome3") or "" end
-    if biomeIndex == 3 then return Read("PriorityBiome4") or "" end
+    if biomeIndex == 0 then return AvailablePriorityKey(Read("PriorityBiome1")) end
+    if biomeIndex == 1 then return AvailablePriorityKey(Read("PriorityBiome2")) end
+    if biomeIndex == 2 then return AvailablePriorityKey(Read("PriorityBiome3")) end
+    if biomeIndex == 3 then return AvailablePriorityKey(Read("PriorityBiome4")) end
     return ""
 end
 
 local function PriorityKeyForTrial(trialIndex)
-    if trialIndex == 1 then return Read("PriorityTrial1") or "" end
-    if trialIndex == 2 then return Read("PriorityTrial2") or "" end
+    if trialIndex == 1 then return AvailablePriorityKey(Read("PriorityTrial1")) end
+    if trialIndex == 2 then return AvailablePriorityKey(Read("PriorityTrial2")) end
     return ""
 end
 

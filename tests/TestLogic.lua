@@ -61,6 +61,30 @@ function TestBiomeControlLogic:testBiomePriorityFiltersEligibleLootUntilSatisfie
     lu.assertEquals(GetEligibleLootNames({}), { "ZeusUpgrade", "ApolloUpgrade" })
 end
 
+function TestBiomeControlLogic:testBiomePriorityIgnoresGodPoolDisabledChoice()
+    ResetBiomeControlHarness({
+        registerHooks = true,
+        config = {
+            Enabled = true,
+            PrioritizeSpecificRewardEnabled = true,
+            PriorityBiome1 = "ApolloUpgrade",
+        },
+        godAvailability = {
+            available = {
+                Apollo = false,
+            },
+        },
+        CurrentRun = {
+            ClearedBiomes = 0,
+        },
+        GetEligibleLootNames = function()
+            return { "ZeusUpgrade", "ApolloUpgrade" }
+        end,
+    })
+
+    lu.assertEquals(GetEligibleLootNames({}), { "ZeusUpgrade", "ApolloUpgrade" })
+end
+
 function TestBiomeControlLogic:testTrialRewardPrioritySetsEncounterLootPair()
     ResetBiomeControlHarness({
         registerHooks = true,
@@ -90,6 +114,42 @@ function TestBiomeControlLogic:testTrialRewardPrioritySetsEncounterLootPair()
 
     lu.assertEquals(room.Encounter.LootAName, "ApolloUpgrade")
     lu.assertEquals(room.Encounter.LootBName, "ZeusUpgrade")
+end
+
+function TestBiomeControlLogic:testTrialRewardPrioritySkipsGodPoolDisabledChoice()
+    ResetBiomeControlHarness({
+        registerHooks = true,
+        config = {
+            Enabled = true,
+            PrioritizeTrialRewardEnabled = true,
+            PriorityTrial1 = "ApolloUpgrade",
+            PriorityTrial2 = "ZeusUpgrade",
+        },
+        godAvailability = {
+            available = {
+                Apollo = false,
+            },
+        },
+        CurrentRun = {},
+        GetInteractedGodsThisRun = function()
+            return { "ApolloUpgrade", "ZeusUpgrade" }
+        end,
+        GetEligibleLootNames = function(excluded)
+            if excluded and excluded[1] == "ApolloUpgrade" then
+                return { "ZeusUpgrade" }
+            end
+            return { "ApolloUpgrade", "ZeusUpgrade" }
+        end,
+    })
+
+    local room = {
+        ChosenRewardType = "Devotion",
+        Encounter = {},
+    }
+    SetupRoomReward(CurrentRun, room, nil, {})
+
+    lu.assertNil(room.Encounter.LootAName)
+    lu.assertNil(room.Encounter.LootBName)
 end
 
 function TestBiomeControlLogic:testForcedNpcEncounterNarrowsLegalEncounterList()

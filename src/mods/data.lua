@@ -36,6 +36,7 @@ internal.modeStorageFields = {}
 internal.priorityOptions = { "" }
 internal.priorityDisplayValues = { [""] = "None" }
 internal.priorityValueColors = {}
+internal.priorityGodByLootKey = {}
 internal.roomModeValues = { "default", "disabled", "forced" }
 internal.roomModeDisplayValues = {
     default = "Default",
@@ -179,6 +180,7 @@ do
     for _, god in ipairs(priorityGods) do
         table.insert(internal.priorityOptions, god.lootKey)
         internal.priorityDisplayValues[god.lootKey] = god.label
+        internal.priorityGodByLootKey[god.lootKey] = god.label
         local inGameColor = god.colorKey and game.Color[god.colorKey] or nil
         if type(inGameColor) == "table" then
             internal.priorityValueColors[god.lootKey] = {

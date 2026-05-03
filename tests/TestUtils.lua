@@ -181,6 +181,7 @@ function ResetBiomeControlHarness(opts)
     opts = opts or {}
     registeredWraps = {}
     installBaseGlobals(opts)
+    lib.integrations.unregisterProvider("TestGodPool")
 
     RunDirectorBiomeControl_Internal = {
         DEFAULT_FIELD_MEDIUM = 0.4,
@@ -210,8 +211,24 @@ function ResetBiomeControlHarness(opts)
     local store, session = lib.createStore(config, definition)
     internal.store = store
 
+    if opts.godAvailability then
+        lib.integrations.register("run-director.god-availability", "TestGodPool", {
+            isActive = function()
+                return opts.godAvailability.active ~= false
+            end,
+            isAvailable = function(godKey)
+                local available = opts.godAvailability.available or {}
+                if available[godKey] ~= nil then
+                    return available[godKey]
+                end
+                return true
+            end,
+        })
+    end
+
     if opts.registerHooks then
         internal.host = lib.createModuleHost({
+            pluginGuid = "adamant-RunDirector_BiomeControl",
             definition = definition,
             store = store,
             session = session,
