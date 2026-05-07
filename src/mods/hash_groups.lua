@@ -21,8 +21,8 @@ local function getRangedControlAliases(def)
 
     return {
         def.modeKey,
-        def.configKeyMin,
-        def.configKeyMax,
+        def.rangeMinAlias,
+        def.rangeMaxAlias,
     }
 end
 

@@ -6,7 +6,7 @@ Part of the [Run Director modpack](https://thunderstore.io/c/hades-ii/p/adamant/
 
 ## What It Does
 
-Biome Control lets you shape what happens inside each biome instead of accepting the default encounter mix.
+Biome Control lets you shape encounter pacing and rewards inside each biome.
 
 The module is organized by biome and exposes controls for:
 

@@ -57,7 +57,7 @@ local function DrawNpcBiomeRow(imgui, session, def)
     if session.view[def.modeKey] == NPC_MODE_FORCED then
         imgui.SameLine()
         imgui.SetCursorPosX(rangeColumnX)
-        internal.DrawRangeDropdowns(imgui, session, def.configKeyMin, def.configKeyMax, def.minDefault, def.maxDefault)
+        internal.DrawRangeDropdowns(imgui, session, def.rangeMinAlias, def.rangeMaxAlias, def.minDefault, def.maxDefault)
     end
     imgui.Unindent(16)
 end

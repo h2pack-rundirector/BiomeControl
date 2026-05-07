@@ -113,7 +113,7 @@ local function DrawRoomRow(imgui, session, def)
     end, def) == "forced" then
         imgui.SameLine()
         imgui.SetCursorPosX(rangeColumnX)
-        DrawRangeDropdowns(imgui, session, def.configKeyMin, def.configKeyMax, def.minDefault, def.maxDefault)
+        DrawRangeDropdowns(imgui, session, def.rangeMinAlias, def.rangeMaxAlias, def.minDefault, def.maxDefault)
     end
 end
 internal.DrawRoomRow = DrawRoomRow

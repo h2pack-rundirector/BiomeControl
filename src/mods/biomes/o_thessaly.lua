@@ -7,6 +7,8 @@ local THESSALY_MINIBOSS_MODE_DISPLAY = {
     captain = "Force The Yargonaut",
     disabled = "Disable Both",
 }
+local THESSALY_MINIBOSS_RANGE_MIN_ALIAS = "PackedForcedThessalyMiniBossMin"
+local THESSALY_MINIBOSS_RANGE_MAX_ALIAS = "PackedForcedThessalyMiniBossMax"
 
 local function appendImpossibleRequirement(plan, roomKey)
     local room = RoomData and RoomData[roomKey]
@@ -69,8 +71,8 @@ internal.registerRoomControl({ id = "Shop", type = "Shop", biome = "O", useRegio
 
 internal.registerRangeField({
     label = "Forced Range",
-    configKeyMin = "PackedForcedThessalyMiniBossMin",
-    configKeyMax = "PackedForcedThessalyMiniBossMax",
+    rangeMinAlias = THESSALY_MINIBOSS_RANGE_MIN_ALIAS,
+    rangeMaxAlias = THESSALY_MINIBOSS_RANGE_MAX_ALIAS,
     min = 3, max = 5,
 })
 
@@ -83,11 +85,6 @@ internal.registerBiomeRoom("O", {
     modeDisplayValues = THESSALY_MINIBOSS_MODE_DISPLAY,
     defaultMode = "default",
     helpText = "(Default lets the game decide, Forced selects one miniboss, Disabled suppresses both)",
-    rangeConfigKeys = {
-        min = "PackedForcedThessalyMiniBossMin",
-        max = "PackedForcedThessalyMiniBossMax",
-    },
-    rangeVisibleValues = { "charybdis", "captain" },
 })
 
 internal.registerPatchBuilder(function(plan, read, log)
@@ -103,8 +100,8 @@ internal.registerPatchBuilder(function(plan, read, log)
         return
     end
 
-    local minValue = read("PackedForcedThessalyMiniBossMin") or 3
-    local maxValue = read("PackedForcedThessalyMiniBossMax") or 5
+    local minValue = read(THESSALY_MINIBOSS_RANGE_MIN_ALIAS) or 3
+    local maxValue = read(THESSALY_MINIBOSS_RANGE_MAX_ALIAS) or 5
     if minValue > maxValue then
         maxValue = minValue
     end
@@ -145,8 +142,8 @@ local function DrawThessalyMinibossRow(imgui, session)
         internal.DrawRangeDropdowns(
             imgui,
             session,
-            "PackedForcedThessalyMiniBossMin",
-            "PackedForcedThessalyMiniBossMax",
+            THESSALY_MINIBOSS_RANGE_MIN_ALIAS,
+            THESSALY_MINIBOSS_RANGE_MAX_ALIAS,
             3,
             5
         )

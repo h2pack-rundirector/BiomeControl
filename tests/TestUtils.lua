@@ -194,11 +194,10 @@ function ResetBiomeControlHarness(opts)
     dofile("src/mods/hash_groups.lua")
     dofile("src/mods/logic.lua")
 
-    local dataDefaults = dofile("src/config.lua")
-    local config = deepCopy(dataDefaults)
+    local config = dofile("src/config.lua")
     applyOverrides(config, opts.config)
 
-    local definition = lib.prepareDefinition(internal, dataDefaults, {
+    local definition = lib.prepareDefinition(internal, {
         modpack = "run-director",
         id = "BiomeControl",
         name = "Biome Control",

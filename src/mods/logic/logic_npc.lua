@@ -10,8 +10,8 @@ local function Read(key)
 end
 
 local function GetCurrentNPCRange(def)
-    local minValue = Read(def.configKeyMin) or 0
-    local maxValue = Read(def.configKeyMax) or 99
+    local minValue = Read(def.rangeMinAlias) or 0
+    local maxValue = Read(def.rangeMaxAlias) or 99
     return minValue, maxValue
 end
 

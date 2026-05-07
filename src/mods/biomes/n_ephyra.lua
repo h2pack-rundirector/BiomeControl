@@ -117,7 +117,7 @@ internal.registerNPCControl({ id = "Heracles", biome = "N", min = 0, max = 10 })
 
 internal.registerStateField({
     type = "dropdown",
-    configKey = "ReplaceHermesInEphyra",
+    alias = "ReplaceHermesInEphyra",
     label = "Hub Hermes Replacement",
     default = "",
     values = internal.hubRewardReplacementOptions,
@@ -125,12 +125,12 @@ internal.registerStateField({
 })
 internal.registerStateField({
     type = "int",
-    configKey = "PackedBannedEphyraSubRoomRewards",
+    alias = "PackedBannedEphyraSubRoomRewards",
     default = 0,
 })
 internal.registerStateField({
     type = "int",
-    configKey = "PackedBannedEphyraSubRoomRewardsHard",
+    alias = "PackedBannedEphyraSubRoomRewardsHard",
     default = 0,
 })
 
@@ -157,19 +157,19 @@ internal.registerBiomeRoom("N", {
 
 internal.registerBiomeReward("N", {
     kind = "field",
-    configKey = "ReplaceHermesInEphyra",
+    alias = "ReplaceHermesInEphyra",
     helpText = "(Replace the Hermes slot in Ephyra HubRewards with another god or remove it)",
 })
 internal.registerBiomeReward("N", {
     kind = "packedCheckboxes",
-    configKey = "PackedBannedEphyraSubRoomRewards",
+    alias = "PackedBannedEphyraSubRoomRewards",
     label = "SubRoomRewards",
     options = subRoomRewardOptions,
     helpText = "(Checked rewards are banned from normal Ephyra subroom reward pools)",
 })
 internal.registerBiomeReward("N", {
     kind = "packedCheckboxes",
-    configKey = "PackedBannedEphyraSubRoomRewardsHard",
+    alias = "PackedBannedEphyraSubRoomRewardsHard",
     label = "SubRoomRewardsHard",
     options = subRoomRewardsHardOptions,
     helpText = "(Checked rewards are banned from hard Ephyra subroom reward pools)",

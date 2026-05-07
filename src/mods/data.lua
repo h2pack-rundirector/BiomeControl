@@ -121,7 +121,6 @@ local function PrepareModeField(entry)
     table.insert(internal.modeStorageFields, {
         type = "int",
         alias = entry.modeKey,
-        configKey = entry.modeKey,
         default = entry.modeValueLookup[entry.defaultMode] or 0,
         min = 0,
         max = math.max(#entry.modeValues - 1, 0),
@@ -218,8 +217,8 @@ local function DefineRoomControl(data)
             keyIdentifier = entry.id .. regionName
         end
     end
-    entry.configKeyMin = entry.configKeyMin or ("Packed" .. entry.type .. keyIdentifier .. "Min")
-    entry.configKeyMax = entry.configKeyMax or ("Packed" .. entry.type .. keyIdentifier .. "Max")
+    entry.rangeMinAlias = entry.rangeMinAlias or ("Packed" .. entry.type .. keyIdentifier .. "Min")
+    entry.rangeMaxAlias = entry.rangeMaxAlias or ("Packed" .. entry.type .. keyIdentifier .. "Max")
     entry.modeKey = entry.modeKey or ("Mode" .. entry.type .. keyIdentifier)
     PrepareModeField(entry)
 
@@ -234,8 +233,8 @@ local function DefineNPCControl(data)
     entry.maxDefault = entry.max
     entry.label = entry.label or entry.id
     entry.groupKey = entry.groupKey or entry.id
-    entry.configKeyMin = entry.configKeyMin or ("PackedNPC" .. entry.id .. regionName .. "Min")
-    entry.configKeyMax = entry.configKeyMax or ("PackedNPC" .. entry.id .. regionName .. "Max")
+    entry.rangeMinAlias = entry.rangeMinAlias or ("PackedNPC" .. entry.id .. regionName .. "Min")
+    entry.rangeMaxAlias = entry.rangeMaxAlias or ("PackedNPC" .. entry.id .. regionName .. "Max")
     entry.modeKey = entry.modeKey or ("ModeNPC" .. entry.id .. regionName)
     entry.modeValues = entry.modeValues or internal.roomModeValues
     entry.modeDisplayValues = entry.modeDisplayValues or internal.roomModeDisplayValues
@@ -271,7 +270,7 @@ end
 for _, entries in pairs(internal.biomeRoomEntries) do
     for _, entry in ipairs(entries) do
         if entry.kind == "modeField" then
-            entry.modeKey = entry.modeKey or entry.configKey or entry.label
+            entry.modeKey = entry.modeKey or entry.alias or entry.label
             PrepareModeField(entry)
         end
     end
@@ -320,24 +319,24 @@ end
 
 function internal.BuildStorage()
     local storage = {
-        { type = "bool",   configKey = "OnlyAllowForcedEncounters" },
-        { type = "bool",   configKey = "IgnoreMaxDepth" },
-        { type = "int",    configKey = "NPCSpacing",                     min = 1, max = 12 },
-        { type = "bool",   configKey = "PrioritizeSpecificRewardEnabled" },
-        { type = "string", configKey = "PriorityBiome1" },
-        { type = "string", configKey = "PriorityBiome2" },
-        { type = "string", configKey = "PriorityBiome3" },
-        { type = "string", configKey = "PriorityBiome4" },
-        { type = "bool",   configKey = "PrioritizeTrialRewardEnabled" },
-        { type = "string", configKey = "PriorityTrial1" },
-        { type = "string", configKey = "PriorityTrial2" },
-        { type = "bool",   configKey = "DreamRouteEnabled" },
-        { type = "string", configKey = "DreamRouteBiome1", default = "G" },
-        { type = "string", configKey = "DreamRouteBiome2", default = "I" },
-        { type = "string", configKey = "DreamRouteBiome3", default = "N" },
-        { type = "string", configKey = "DreamRouteBiome4", default = "P" },
-        { type = "string", alias = "UnderworldTab", lifetime = "transient", default = "NPCs", maxLen = 32 },
-        { type = "string", alias = "SurfaceTab",    lifetime = "transient", default = "NPCs", maxLen = 32 },
+        { type = "bool",   alias = "OnlyAllowForcedEncounters",       default = false },
+        { type = "bool",   alias = "IgnoreMaxDepth",                 default = false },
+        { type = "int",    alias = "NPCSpacing",                     default = 6, min = 1, max = 12 },
+        { type = "bool",   alias = "PrioritizeSpecificRewardEnabled", default = false },
+        { type = "string", alias = "PriorityBiome1",                 default = "" },
+        { type = "string", alias = "PriorityBiome2",                 default = "" },
+        { type = "string", alias = "PriorityBiome3",                 default = "" },
+        { type = "string", alias = "PriorityBiome4",                 default = "" },
+        { type = "bool",   alias = "PrioritizeTrialRewardEnabled",    default = false },
+        { type = "string", alias = "PriorityTrial1",                 default = "" },
+        { type = "string", alias = "PriorityTrial2",                 default = "" },
+        { type = "bool",   alias = "DreamRouteEnabled",              default = false },
+        { type = "string", alias = "DreamRouteBiome1",               default = "G" },
+        { type = "string", alias = "DreamRouteBiome2",               default = "I" },
+        { type = "string", alias = "DreamRouteBiome3",               default = "N" },
+        { type = "string", alias = "DreamRouteBiome4",               default = "P" },
+        { type = "string", alias = "UnderworldTab", persist = false, hash = false, default = "NPCs", maxLen = 32 },
+        { type = "string", alias = "SurfaceTab",    persist = false, hash = false, default = "NPCs", maxLen = 32 },
     }
 
     local storageTypeMap = { checkbox = "bool", stepper = "int", dropdown = "string", int32 = "int" }
@@ -345,14 +344,14 @@ function internal.BuildStorage()
 
     for _, rewards in pairs(internal.biomeRewards or {}) do
         for _, reward in ipairs(rewards) do
-            if reward.kind == "packedCheckboxes" and type(reward.configKey) == "string" and reward.configKey ~= "" then
-                packedRewardFields[reward.configKey] = reward
+            if reward.kind == "packedCheckboxes" and type(reward.alias) == "string" and reward.alias ~= "" then
+                packedRewardFields[reward.alias] = reward
             end
         end
     end
 
     for _, field in ipairs(internal.specialStateFields) do
-        if not packedRewardFields[field.configKey] then
+        if not packedRewardFields[field.alias] then
             local storageType = storageTypeMap[field.type] or field.type
             local default = field.default
             if default == nil then
@@ -366,7 +365,7 @@ function internal.BuildStorage()
             end
             table.insert(storage, {
                 type = storageType,
-                configKey = field.configKey,
+                alias = field.alias,
                 default = default,
                 min = field.min,
                 max = field.max,
@@ -374,11 +373,11 @@ function internal.BuildStorage()
         end
     end
 
-    for configKey, reward in pairs(packedRewardFields) do
+    for alias, reward in pairs(packedRewardFields) do
         local bits = {}
         for _, option in ipairs(reward.options or {}) do
             bits[#bits + 1] = {
-                alias = configKey .. "_" .. tostring(option.name or option.label or option.bit),
+                alias = alias .. "_" .. tostring(option.name or option.label or option.bit),
                 label = option.label or tostring(option.name or option.bit),
                 type = "bool",
                 offset = option.bit,
@@ -388,8 +387,7 @@ function internal.BuildStorage()
         end
         table.insert(storage, {
             type = "packedInt",
-            configKey = configKey,
-            alias = configKey,
+            alias = alias,
             default = 0,
             bits = bits,
         })
@@ -398,14 +396,14 @@ function internal.BuildStorage()
     for _, field in ipairs(internal.specialRangeFields) do
         table.insert(storage, {
             type = "int",
-            configKey = field.configKeyMin,
+            alias = field.rangeMinAlias,
             default = field.min,
             min = field.min,
             max = field.max,
         })
         table.insert(storage, {
             type = "int",
-            configKey = field.configKeyMax,
+            alias = field.rangeMaxAlias,
             default = field.max,
             min = field.min,
             max = field.max,
@@ -419,21 +417,21 @@ function internal.BuildStorage()
     local function addDepthStorageNodes(definitions)
         local seen = {}
         for _, def in ipairs(definitions) do
-            if not seen[def.configKeyMin] then
-                seen[def.configKeyMin] = true
+            if not seen[def.rangeMinAlias] then
+                seen[def.rangeMinAlias] = true
                 table.insert(storage, {
                     type = "int",
-                    configKey = def.configKeyMin,
+                    alias = def.rangeMinAlias,
                     default = def.minDefault,
                     min = def.minDefault,
                     max = def.maxDefault,
                 })
             end
-            if not seen[def.configKeyMax] then
-                seen[def.configKeyMax] = true
+            if not seen[def.rangeMaxAlias] then
+                seen[def.rangeMaxAlias] = true
                 table.insert(storage, {
                     type = "int",
-                    configKey = def.configKeyMax,
+                    alias = def.rangeMaxAlias,
                     default = def.maxDefault,
                     min = def.minDefault,
                     max = def.maxDefault,

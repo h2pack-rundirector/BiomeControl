@@ -171,8 +171,8 @@ function internal.BuildBiomePatchPlan(plan)
                     plan,
                     def,
                     roomKey,
-                    Read(def.configKeyMin),
-                    Read(def.configKeyMax)
+                    Read(def.rangeMinAlias),
+                    Read(def.rangeMaxAlias)
                 )
             elseif mode == "disabled" then
                 DisableRoom(plan, def, roomKey)
@@ -185,8 +185,8 @@ function internal.BuildBiomePatchPlan(plan)
         if trialDef and GetDefinitionMode(trialDef) == "forced" then
             for _, roomKey in ipairs(roomKeys) do
                 if RoomSetData[biomeCode] and RoomSetData[biomeCode][roomKey] then
-                    SetForcedReward(plan, biomeCode, roomKey, "Devotion", Read(trialDef.configKeyMin),
-                        Read(trialDef.configKeyMax))
+                    SetForcedReward(plan, biomeCode, roomKey, "Devotion", Read(trialDef.rangeMinAlias),
+                        Read(trialDef.rangeMaxAlias))
                     Log("Deterministically injected trial reward into " .. roomKey)
                     break
                 end

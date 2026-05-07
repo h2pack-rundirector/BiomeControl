@@ -12,7 +12,6 @@ local reload = mods["SGG_Modding-ReLoad"]
 ---@type AdamantModpackLib
 lib = mods["adamant-ModpackLib"]
 
-local dataDefaults = import("config.lua")
 local config = chalk.auto("config.lua")
 
 local PACK_ID = "run-director"
@@ -65,7 +64,7 @@ local function init()
     import("mods/logic.lua")
     import("mods/ui.lua")
 
-    local definition = lib.prepareDefinition(internal, dataDefaults, {
+    local definition = lib.prepareDefinition(internal, {
         modpack = PACK_ID,
         id = MODULE_ID,
         name = "Biome Control",
