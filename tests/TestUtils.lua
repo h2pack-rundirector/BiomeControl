@@ -197,16 +197,22 @@ function ResetBiomeControlHarness(opts)
     local config = dofile("src/config.lua")
     applyOverrides(config, opts.config)
 
-    local definition = lib.prepareDefinition(internal, {
-        modpack = "run-director",
-        id = "BiomeControl",
-        name = "Biome Control",
-        storage = internal.BuildStorage(),
-        hashGroupPlan = internal.BuildHashGroupPlan and internal.BuildHashGroupPlan() or nil,
+    internal.host, internal.store = lib.createModule({
+        owner = internal,
+        pluginGuid = "adamant-RunDirector_BiomeControl",
+        config = config,
+        definition = {
+            modpack = "run-director",
+            id = "BiomeControl",
+            name = "Biome Control",
+            storage = internal.BuildStorage(),
+            hashGroupPlan = internal.BuildHashGroupPlan and internal.BuildHashGroupPlan() or nil,
+        },
+        registerPatchMutation = internal.BuildPatchPlan,
+        registerHooks = opts.registerHooks and internal.RegisterHooks or nil,
+        drawTab = function() end,
     })
-
-    local store, session = lib.createStore(config, definition)
-    internal.store = store
+    local store = internal.store
 
     if opts.godAvailability then
         lib.integrations.register("run-director.god-availability", "TestGodPool", {
@@ -223,29 +229,13 @@ function ResetBiomeControlHarness(opts)
         })
     end
 
-    if opts.registerHooks then
-        internal.host = lib.createModuleHost({
-            pluginGuid = "adamant-RunDirector_BiomeControl",
-            definition = definition,
-            store = store,
-            session = session,
-            registerPatchMutation = internal.BuildPatchPlan,
-            drawTab = function() end,
-            hookOwner = internal,
-            registerHooks = internal.RegisterHooks,
-        })
-    end
+    local liveHost = lib.getLiveModuleHost("adamant-RunDirector_BiomeControl")
 
     return {
         internal = internal,
-        definition = definition,
-        mutationBundle = {
-            affectsRunData = true,
-            patchMutation = internal.BuildPatchPlan,
-        },
         config = config,
         store = store,
-        session = session,
+        liveHost = liveHost,
         wrappers = registeredWraps,
     }
 end
