@@ -17,16 +17,14 @@ local underworldTrialRooms = {
           "G_Combat16", "G_Combat17" },
 }
 
-local function Read(key)
-    return internal.BiomeControlRead(key)
+local function MakeLog(read)
+    return function(fmt, ...)
+        lib.logging.logIf(MODULE_ID, read("DebugMode") == true, fmt, ...)
+    end
 end
 
-local function Log(fmt, ...)
-    lib.logging.logIf(MODULE_ID, Read("DebugMode") == true, fmt, ...)
-end
-
-local function GetDefinitionMode(def)
-    return internal.GetModeValue(Read, def)
+local function GetDefinitionMode(read, def)
+    return internal.GetModeValue(read, def)
 end
 
 local function IsPriorityLootAvailable(lootKey)
@@ -50,18 +48,18 @@ local function AvailablePriorityKey(lootKey)
     return lootKey
 end
 
-local function PriorityKeyForBiome(biomeIndex)
+local function PriorityKeyForBiome(read, biomeIndex)
     biomeIndex = math.max((biomeIndex or 0) - 1, 0)
-    if biomeIndex == 0 then return AvailablePriorityKey(Read("PriorityBiome1")) end
-    if biomeIndex == 1 then return AvailablePriorityKey(Read("PriorityBiome2")) end
-    if biomeIndex == 2 then return AvailablePriorityKey(Read("PriorityBiome3")) end
-    if biomeIndex == 3 then return AvailablePriorityKey(Read("PriorityBiome4")) end
+    if biomeIndex == 0 then return AvailablePriorityKey(read("PriorityBiome1")) end
+    if biomeIndex == 1 then return AvailablePriorityKey(read("PriorityBiome2")) end
+    if biomeIndex == 2 then return AvailablePriorityKey(read("PriorityBiome3")) end
+    if biomeIndex == 3 then return AvailablePriorityKey(read("PriorityBiome4")) end
     return ""
 end
 
-local function PriorityKeyForTrial(trialIndex)
-    if trialIndex == 1 then return AvailablePriorityKey(Read("PriorityTrial1")) end
-    if trialIndex == 2 then return AvailablePriorityKey(Read("PriorityTrial2")) end
+local function PriorityKeyForTrial(read, trialIndex)
+    if trialIndex == 1 then return AvailablePriorityKey(read("PriorityTrial1")) end
+    if trialIndex == 2 then return AvailablePriorityKey(read("PriorityTrial2")) end
     return ""
 end
 
@@ -161,18 +159,19 @@ local function SetForcedReward(plan, roomSetKey, roomKey, rewardName, minValue, 
     })
 end
 
-function internal.BuildBiomePatchPlan(plan)
+function internal.BuildBiomePatchPlan(plan, read)
+    local log = MakeLog(read)
     for _, def in ipairs(roomDefinitions) do
         local roomKey = GetRoomKey(def)
         if roomKey then
-            local mode = GetDefinitionMode(def)
+            local mode = GetDefinitionMode(read, def)
             if mode == "forced" then
                 ApplyRangeOverride(
                     plan,
                     def,
                     roomKey,
-                    Read(def.rangeMinAlias),
-                    Read(def.rangeMaxAlias)
+                    read(def.rangeMinAlias),
+                    read(def.rangeMaxAlias)
                 )
             elseif mode == "disabled" then
                 DisableRoom(plan, def, roomKey)
@@ -182,12 +181,12 @@ function internal.BuildBiomePatchPlan(plan)
 
     for biomeCode, roomKeys in pairs(underworldTrialRooms) do
         local trialDef = roomLookup.Trial and roomLookup.Trial[biomeCode]
-        if trialDef and GetDefinitionMode(trialDef) == "forced" then
+        if trialDef and GetDefinitionMode(read, trialDef) == "forced" then
             for _, roomKey in ipairs(roomKeys) do
                 if RoomSetData[biomeCode] and RoomSetData[biomeCode][roomKey] then
-                    SetForcedReward(plan, biomeCode, roomKey, "Devotion", Read(trialDef.rangeMinAlias),
-                        Read(trialDef.rangeMaxAlias))
-                    Log("Deterministically injected trial reward into " .. roomKey)
+                    SetForcedReward(plan, biomeCode, roomKey, "Devotion", read(trialDef.rangeMinAlias),
+                        read(trialDef.rangeMaxAlias))
+                    log("Deterministically injected trial reward into " .. roomKey)
                     break
                 end
             end
@@ -195,22 +194,22 @@ function internal.BuildBiomePatchPlan(plan)
     end
 
     for _, builder in ipairs(internal.biomePatchBuilders or {}) do
-        builder(plan, Read, Log)
+        builder(plan, read, log)
     end
 end
 
-function internal.RegisterBiomeHooks()
+function internal.RegisterBiomeHooks(read, isEnabled)
     lib.hooks.Wrap(internal, "GetEligibleLootNames", function(base, excludeLootNames)
-        if not internal.IsEnabled() then return base(excludeLootNames) end
+        if not isEnabled() then return base(excludeLootNames) end
 
-        local state = internal.GetRunState()
+        local state = internal.GetRunState(read)
         if not state then return base(excludeLootNames) end
         state.BiomePrioritySatisfied = state.BiomePrioritySatisfied or {}
 
         local eligible = base(excludeLootNames)
         local currentBiomeIndex = CurrentRun and CurrentRun.ClearedBiomes or 0
-        local priorityLootKey = PriorityKeyForBiome(currentBiomeIndex)
-        local isPriorityMode = Read("PrioritizeSpecificRewardEnabled") and priorityLootKey ~= "" and
+        local priorityLootKey = PriorityKeyForBiome(read, currentBiomeIndex)
+        local isPriorityMode = read("PrioritizeSpecificRewardEnabled") and priorityLootKey ~= "" and
             not state.BiomePrioritySatisfied[currentBiomeIndex]
 
         if isPriorityMode and Contains(eligible, priorityLootKey) then
@@ -221,15 +220,15 @@ function internal.RegisterBiomeHooks()
     end)
 
     lib.hooks.Wrap(internal, "GiveLoot", function(base, args)
-        if not internal.IsEnabled() then return base(args) end
+        if not isEnabled() then return base(args) end
 
-        local state = internal.GetRunState()
+        local state = internal.GetRunState(read)
         if not state then return base(args) end
 
         local result = base(args)
         local currentBiomeIndex = CurrentRun and CurrentRun.ClearedBiomes or 0
         local lootName = args and (args.ForceLootName or args.Name)
-        if Read("PrioritizeSpecificRewardEnabled") and lootName == PriorityKeyForBiome(currentBiomeIndex) then
+        if read("PrioritizeSpecificRewardEnabled") and lootName == PriorityKeyForBiome(read, currentBiomeIndex) then
             state.BiomePrioritySatisfied[currentBiomeIndex] = true
         end
         return result
@@ -237,14 +236,14 @@ function internal.RegisterBiomeHooks()
 
     lib.hooks.Wrap(internal, "SetupRoomReward", function(base, currentRun, room, previouslyChosenRewards, args)
         base(currentRun, room, previouslyChosenRewards, args)
-        if not internal.IsEnabled() then return end
+        if not isEnabled() then return end
 
         local chosenRewardType = args and args.ChosenRewardType or room.ChosenRewardType
         if chosenRewardType ~= "Devotion" or not room or not room.Encounter then return end
-        if not Read("PrioritizeTrialRewardEnabled") then return end
+        if not read("PrioritizeTrialRewardEnabled") then return end
 
-        local prioA = PriorityKeyForTrial(1)
-        local prioB = PriorityKeyForTrial(2)
+        local prioA = PriorityKeyForTrial(read, 1)
+        local prioB = PriorityKeyForTrial(read, 2)
         local interacted = GetInteractedGodsThisRun() or {}
         if prioA ~= "" and prioB ~= "" and prioA ~= prioB and
             Contains(interacted, prioA) and Contains(interacted, prioB) and
@@ -256,6 +255,6 @@ function internal.RegisterBiomeHooks()
     end)
 
     if internal.RegisterFieldsHooks then
-        internal.RegisterFieldsHooks()
+        internal.RegisterFieldsHooks(read, isEnabled)
     end
 end

@@ -197,7 +197,7 @@ function ResetBiomeControlHarness(opts)
     local config = dofile("src/config.lua")
     applyOverrides(config, opts.config)
 
-    internal.host, internal.store = lib.createModule({
+    local host, store = lib.createModule({
         owner = internal,
         pluginGuid = "adamant-RunDirector_BiomeControl",
         config = config,
@@ -212,7 +212,7 @@ function ResetBiomeControlHarness(opts)
         registerHooks = opts.registerHooks and internal.RegisterHooks or nil,
         drawTab = function() end,
     })
-    local store = internal.store
+    host.activate()
 
     if opts.godAvailability then
         lib.integrations.register("run-director.god-availability", "TestGodPool", {

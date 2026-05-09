@@ -18,12 +18,11 @@ local PACK_ID = "run-director"
 local MODULE_ID = "BiomeControl"
 local PLUGIN_GUID = _PLUGIN.guid
 ---@class RunDirectorBiomeControlInternal
----@field store ManagedStore|nil
----@field host AuthorHost|nil
 ---@field standaloneUi StandaloneRuntime|nil
 ---@field BuildStorage fun(): StorageSchema|nil
 ---@field BuildHashGroupPlan fun(): table|nil
----@field RegisterHooks fun()|nil
+---@field BuildPatchPlan fun(plan: table, store: ManagedStore)|nil
+---@field RegisterHooks fun(store: ManagedStore, host: AuthorHost)|nil
 ---@field DrawTab fun(imgui: table, session: AuthorSession)|nil
 ---@field DrawQuickContent fun(imgui: table, session: AuthorSession)|nil
 ---@field DEFAULT_FIELD_MEDIUM number|nil
@@ -65,7 +64,7 @@ local function init()
     import("mods/logic.lua")
     import("mods/ui.lua")
 
-    internal.host, internal.store = lib.createModule({
+    local host = lib.createModule({
         owner = internal,
         pluginGuid = PLUGIN_GUID,
         config = config,
@@ -82,6 +81,7 @@ local function init()
         drawTab = internal.DrawTab,
         drawQuickContent = internal.DrawQuickContent,
     })
+    host.activate()
     if not lib.isModuleCoordinated(PACK_ID) then
         internal.standaloneUi = lib.standaloneHost(PLUGIN_GUID)
     else

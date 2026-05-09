@@ -5,31 +5,27 @@ local npcPriorityList = { "Artemis", "Icarus", "Heracles", "Athena", "Nemesis" }
 local forcePattern = "[FGHINOPQ]$"
 local strictPattern = "[FGHINOPQ]0?2?$"
 
-local function Read(key)
-    return internal.BiomeControlRead(key)
-end
-
-local function GetCurrentNPCRange(def)
-    local minValue = Read(def.rangeMinAlias) or 0
-    local maxValue = Read(def.rangeMaxAlias) or 99
+local function GetCurrentNPCRange(read, def)
+    local minValue = read(def.rangeMinAlias) or 0
+    local maxValue = read(def.rangeMaxAlias) or 99
     return minValue, maxValue
 end
 
-function internal.BuildNPCPatchPlan(plan)
+function internal.BuildNPCPatchPlan(plan, read)
     if NamedRequirementsData.NoRecentFieldNPCEncounter and NamedRequirementsData.NoRecentFieldNPCEncounter[1] then
-        plan:set(NamedRequirementsData.NoRecentFieldNPCEncounter[1], "SumPrevRooms", Read("NPCSpacing") or 6)
+        plan:set(NamedRequirementsData.NoRecentFieldNPCEncounter[1], "SumPrevRooms", read("NPCSpacing") or 6)
     end
 end
 
-function internal.RegisterNPCHooks()
+function internal.RegisterNPCHooks(read, isEnabled)
     lib.hooks.Wrap(internal, "ChooseEncounter", function(base, currentRun, room, args)
-        if not internal.IsEnabled() then return base(currentRun, room, args) end
+        if not isEnabled() then return base(currentRun, room, args) end
 
         args = args or {}
         local legalEncounters = args.LegalEncounters or room.LegalEncounters
         if not legalEncounters then return base(currentRun, room, args) end
 
-        local state = internal.GetRunState()
+        local state = internal.GetRunState(read)
         if not state then return base(currentRun, room, args) end
 
         local currentRoomSet = room and room.RoomSetName
@@ -44,8 +40,8 @@ function internal.RegisterNPCHooks()
             if perPending and currentRoomSet and perPending[currentRoomSet] and not encounterSeen[actualNPCName] then
                 local def = group.lookup and group.lookup[currentRoomSet]
                 if def then
-                    local minValue, maxValue = GetCurrentNPCRange(def)
-                    local depthOkay = biomeDepth >= minValue and (Read("IgnoreMaxDepth") or biomeDepth <= maxValue)
+                    local minValue, maxValue = GetCurrentNPCRange(read, def)
+                    local depthOkay = biomeDepth >= minValue and (read("IgnoreMaxDepth") or biomeDepth <= maxValue)
                     if depthOkay then
                         for _, encounterName in ipairs(legalEncounters) do
                             if type(encounterName) == "string"
@@ -83,8 +79,8 @@ function internal.RegisterNPCHooks()
                             local def = npcLookup[npcName] and npcLookup[npcName][currentRoomSet]
                             if def then
                                 local perPending = pending[def.groupKey]
-                                local mode = internal.GetModeValue(Read, def)
-                                local minValue, maxValue = GetCurrentNPCRange(def)
+                                local mode = internal.GetModeValue(read, def)
+                                local minValue, maxValue = GetCurrentNPCRange(read, def)
                                 if mode == "disabled" then
                                     restricted = true
                                 elseif mode ~= "forced" then
@@ -93,7 +89,7 @@ function internal.RegisterNPCHooks()
                                     restricted = true
                                 elseif biomeDepth < minValue then
                                     restricted = true
-                                elseif not Read("IgnoreMaxDepth") and biomeDepth > maxValue then
+                                elseif not read("IgnoreMaxDepth") and biomeDepth > maxValue then
                                     restricted = true
                                 end
                             elseif state.OnlyAllowForcedEncounters then
@@ -121,8 +117,8 @@ function internal.RegisterNPCHooks()
 
     for _, npcName in ipairs(npcPriorityList) do
         lib.hooks.Wrap(internal, "Begin" .. npcName .. "Encounter", function(base, currentRun, room, args)
-            if internal.IsEnabled() then
-                local state = internal.GetRunState()
+            if isEnabled() then
+                local state = internal.GetRunState(read)
                 if state then
                     state.NPCEncounterSeen[npcName] = true
                 end

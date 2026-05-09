@@ -7,10 +7,6 @@ local ROUTE_KEYS = {
     "DreamRouteBiome4",
 }
 
-local function Read(key)
-    return internal.BiomeControlRead(key)
-end
-
 local function IsKnownBiome(value)
     return internal.dreamBiomeDisplayValues[value] ~= nil
 end
@@ -29,12 +25,12 @@ local function IsValidRoute(route)
     return #route == 4
 end
 
-local function GetConfiguredRoute()
-    if Read("DreamRouteEnabled") ~= true then return nil end
+local function GetConfiguredRoute(read)
+    if read("DreamRouteEnabled") ~= true then return nil end
 
     local route = {}
     for _, key in ipairs(ROUTE_KEYS) do
-        route[#route + 1] = Read(key)
+        route[#route + 1] = read(key)
     end
 
     if not IsValidRoute(route) then
@@ -50,14 +46,14 @@ local function UpdateDreamBiomePool(route, slot)
     end
 end
 
-function internal.RegisterDreamHooks()
+function internal.RegisterDreamHooks(read, isEnabled)
     lib.hooks.Wrap(internal, "SelectNextDreamBiome", function(base, currentRoomSet)
-        if not internal.IsEnabled() then return base(currentRoomSet) end
+        if not isEnabled() then return base(currentRoomSet) end
         if not CurrentRun or not CurrentRun.IsDreamRun or not CurrentRun.CurrentRoom then
             return base(currentRoomSet)
         end
 
-        local route = GetConfiguredRoute()
+        local route = GetConfiguredRoute(read)
         if not route then return base(currentRoomSet) end
 
         local slot = (CurrentRun.EnteredBiomes or 0) + 1
