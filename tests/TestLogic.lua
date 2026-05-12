@@ -39,6 +39,50 @@ function TestBiomeControlLogic:testPatchPlanAppliesAndRevertsRoomAndNpcMutations
     lu.assertEquals(#RoomData.H_MiniBoss01.GameStateRequirements, 0)
 end
 
+function TestBiomeControlLogic:testForcedErebusTrialInjectsDevotionReward()
+    local harness = ResetBiomeControlHarness({
+        config = {
+            ModeTrialErebus = 2,
+            PackedTrialErebusMin = 7,
+            PackedTrialErebusMax = 9,
+        },
+        RoomSetData = {
+            F = {
+                F_Combat05 = { Name = "F_Combat05" },
+            },
+        },
+    })
+
+    local okApply, applyErr = harness.liveHost.applyMutation()
+    lu.assertTrue(okApply, tostring(applyErr))
+
+    lu.assertEquals(RoomSetData.F.F_Combat05.ForcedReward, "Devotion")
+    lu.assertEquals(RoomSetData.F.F_Combat05.ForceAtBiomeDepthMin, 7)
+    lu.assertEquals(RoomSetData.F.F_Combat05.ForceAtBiomeDepthMax, 9)
+end
+
+function TestBiomeControlLogic:testForcedOceanusTrialInjectsDevotionReward()
+    local harness = ResetBiomeControlHarness({
+        config = {
+            ModeTrialOceanus = 2,
+            PackedTrialOceanusMin = 4,
+            PackedTrialOceanusMax = 6,
+        },
+        RoomSetData = {
+            G = {
+                G_Combat02 = { Name = "G_Combat02" },
+            },
+        },
+    })
+
+    local okApply, applyErr = harness.liveHost.applyMutation()
+    lu.assertTrue(okApply, tostring(applyErr))
+
+    lu.assertEquals(RoomSetData.G.G_Combat02.ForcedReward, "Devotion")
+    lu.assertEquals(RoomSetData.G.G_Combat02.ForceAtBiomeDepthMin, 4)
+    lu.assertEquals(RoomSetData.G.G_Combat02.ForceAtBiomeDepthMax, 6)
+end
+
 function TestBiomeControlLogic:testBiomePriorityFiltersEligibleLootUntilSatisfied()
     ResetBiomeControlHarness({
         registerHooks = true,
@@ -228,6 +272,79 @@ function TestBiomeControlLogic:testFieldsTwoRewardHookOverridesEarlyCombatRooms(
     })
 
     lu.assertEquals(result, 2)
+end
+
+function TestBiomeControlLogic:testEphyraLogicReplacesHermesAndFiltersSubroomRewards()
+    local harness = ResetBiomeControlHarness({
+        config = {
+            ReplaceHermesInEphyra = "ApolloUpgrade",
+            PackedBannedEphyraSubRoomRewards = bit32.lshift(1, 0),
+            PackedBannedEphyraSubRoomRewardsHard = bit32.lshift(1, 2),
+        },
+        RewardStoreData = {
+            HubRewards = {
+                { Name = "HermesUpgrade", GameStateRequirements = { "remove me" } },
+            },
+            SubRoomRewards = {
+                { Name = "MaxManaDropSmall" },
+                { Name = "GiftDrop" },
+            },
+            SubRoomRewardsHard = {
+                { Name = "StackUpgrade" },
+                { Name = "Money" },
+            },
+        },
+        CurrentRun = {},
+        EncounterData = {
+            BaseArtemisCombat = {},
+        },
+    })
+
+    local okApply, applyErr = harness.liveHost.applyMutation()
+    lu.assertTrue(okApply, tostring(applyErr))
+
+    lu.assertEquals(RewardStoreData.HubRewards[1].Name, "ApolloUpgrade")
+    lu.assertNil(RewardStoreData.HubRewards[1].GameStateRequirements)
+    lu.assertEquals(RewardStoreData.SubRoomRewards, {
+        { Name = "GiftDrop" },
+    })
+    lu.assertEquals(RewardStoreData.SubRoomRewardsHard, {
+        { Name = "Money" },
+    })
+    lu.assertEquals(EncounterData.BaseArtemisCombat.RequireNotRoomReward, { "ApolloUpgrade" })
+end
+
+function TestBiomeControlLogic:testThessalyLogicForcesSelectedMiniboss()
+    local harness = ResetBiomeControlHarness({
+        config = {
+            ThessalyMiniBossMode = 1,
+            PackedForcedThessalyMiniBossMin = 3,
+            PackedForcedThessalyMiniBossMax = 5,
+        },
+        RoomData = {
+            O_MiniBoss01 = {
+                Name = "O_MiniBoss01",
+                GameStateRequirements = {
+                    { Path = { "CurrentRun", "BiomeDepthCache" }, Comparison = ">=", Value = 2 },
+                    { Path = { "CurrentRun", "BiomeDepthCache" }, Comparison = "<=", Value = 4 },
+                },
+            },
+            O_MiniBoss02 = {
+                Name = "O_MiniBoss02",
+                GameStateRequirements = {},
+            },
+        },
+    })
+
+    local okApply, applyErr = harness.liveHost.applyMutation()
+    lu.assertTrue(okApply, tostring(applyErr))
+
+    lu.assertTrue(RoomData.O_MiniBoss01.AlwaysForce)
+    lu.assertEquals(RoomData.O_MiniBoss01.ForceAtBiomeDepthMin, 3)
+    lu.assertEquals(RoomData.O_MiniBoss01.ForceAtBiomeDepthMax, 5)
+    lu.assertEquals(RoomData.O_MiniBoss01.GameStateRequirements[1].Value, 3)
+    lu.assertEquals(RoomData.O_MiniBoss01.GameStateRequirements[2].Value, 5)
+    lu.assertEquals(RoomData.O_MiniBoss02.GameStateRequirements[1].Value, -1)
 end
 
 function TestBiomeControlLogic:testDreamRouteSetsNextRoomSetAndPool()

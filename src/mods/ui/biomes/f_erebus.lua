@@ -1,0 +1,31 @@
+local module = {}
+local definitions
+local catalog
+local components
+
+local ROOM_SECTION = {
+    label = "Rooms",
+    color = { 0.90, 0.82, 0.56, 1.0 },
+    types = { "Story", "Trial", "Fountain", "Shop" },
+}
+
+local MINIBOSS_SECTION = {
+    label = "Minibosses",
+    color = { 0.88, 0.38, 0.32, 1.0 },
+    types = { "MiniBoss" },
+}
+
+function module.draw(imgui, session)
+    local drewRooms = components.DrawRoomSection(imgui, session, definitions, catalog, "F", ROOM_SECTION)
+    local drewMinibosses = components.DrawRoomSection(imgui, session, definitions, catalog, "F", MINIBOSS_SECTION)
+    return drewRooms or drewMinibosses
+end
+
+function module.bind(deps)
+    definitions = deps.definitions
+    catalog = deps.catalog
+    components = deps.components
+    return module
+end
+
+return module

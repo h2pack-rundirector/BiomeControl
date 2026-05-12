@@ -1,3 +1,5 @@
+-- luacheck: globals MODULE_ANCHOR
+
 public = {}
 _PLUGIN = { guid = "test-biome-control" }
 
@@ -106,6 +108,7 @@ local function installBaseGlobals(opts)
 
     CurrentRun = opts.CurrentRun
     GameState = opts.GameState or {}
+    RewardStoreData = deepCopy(opts.RewardStoreData)
     RoomData = deepCopy(opts.RoomData or {
         F_Story01 = {
             Name = "F_Story01",
@@ -183,33 +186,28 @@ function ResetBiomeControlHarness(opts)
     installBaseGlobals(opts)
     lib.integrations.unregisterProvider("TestGodPool")
 
-    RunDirectorBiomeControl_Internal = {
-        DEFAULT_FIELD_MEDIUM = 0.4,
-        REGION_UNDERWORLD = 1,
-        REGION_SURFACE = 2,
-    }
+    MODULE_ANCHOR = {}
 
-    local internal = RunDirectorBiomeControl_Internal
-    dofile("src/mods/data.lua")
-    dofile("src/mods/hash_groups.lua")
-    dofile("src/mods/logic.lua")
+    local data = dofile("src/mods/data.lua")
+    local hashGroups = import("mods/hash_groups.lua").bind(data)
+    local logic = import("mods/logic.lua").bind(data)
 
     local config = dofile("src/config.lua")
     applyOverrides(config, opts.config)
 
     local host, store = lib.createModule({
-        owner = internal,
+        owner = MODULE_ANCHOR,
         pluginGuid = "adamant-RunDirector_BiomeControl",
         config = config,
         definition = {
             modpack = "run-director",
             id = "BiomeControl",
             name = "Biome Control",
-            storage = internal.BuildStorage(),
-            hashGroupPlan = internal.BuildHashGroupPlan and internal.BuildHashGroupPlan() or nil,
+            storage = data.storage.build(),
+            hashGroupPlan = hashGroups.buildHashGroupPlan(),
         },
-        registerPatchMutation = internal.BuildPatchPlan,
-        registerHooks = opts.registerHooks and internal.RegisterHooks or nil,
+        registerPatchMutation = logic.buildPatchPlan,
+        registerHooks = opts.registerHooks and logic.registerHooks or nil,
         drawTab = function() end,
     })
     host.activate()
@@ -232,7 +230,9 @@ function ResetBiomeControlHarness(opts)
     local liveHost = lib.getLiveModuleHost("adamant-RunDirector_BiomeControl")
 
     return {
-        internal = internal,
+        moduleAnchor = MODULE_ANCHOR,
+        data = data,
+        logic = logic,
         config = config,
         store = store,
         liveHost = liveHost,

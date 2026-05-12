@@ -1,16 +1,17 @@
-local internal = RunDirectorBiomeControl_Internal
+local hashGroups = {}
+local catalog
 
 local function getRoomDef(id, biome)
-    return internal.roomLookup
-        and internal.roomLookup[id]
-        and internal.roomLookup[id][biome]
+    return catalog.roomLookup
+        and catalog.roomLookup[id]
+        and catalog.roomLookup[id][biome]
         or nil
 end
 
 local function getNpcDef(id, biome)
-    return internal.npcLookup
-        and internal.npcLookup[id]
-        and internal.npcLookup[id][biome]
+    return catalog.npcLookup
+        and catalog.npcLookup[id]
+        and catalog.npcLookup[id][biome]
         or nil
 end
 
@@ -26,7 +27,7 @@ local function getRangedControlAliases(def)
     }
 end
 
-function internal.BuildHashGroupPlan()
+function hashGroups.buildHashGroupPlan()
     return {
         {
             keyPrefix = "global",
@@ -132,4 +133,9 @@ function internal.BuildHashGroupPlan()
     }
 end
 
-return internal
+function hashGroups.bind(data)
+    catalog = data.catalog
+    return hashGroups
+end
+
+return hashGroups
