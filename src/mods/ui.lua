@@ -77,7 +77,7 @@ function module.drawTab(imgui, session)
 end
 
 function module.drawQuickContent(imgui, session)
-    lib.widgets.confirmButton(imgui, "biome_control_quick_reset_all", "Reset To Default", {
+    lib.widgets.confirmButton(imgui, session, "biome_control_quick_reset_all", "Reset To Default", {
         confirmLabel = "Confirm Reset All",
         onConfirm = function()
             session.resetToDefaults()

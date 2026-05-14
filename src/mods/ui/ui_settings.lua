@@ -127,7 +127,7 @@ local function BindDraw()
         imgui.Spacing()
         lib.widgets.separator(imgui)
         imgui.Spacing()
-        lib.widgets.confirmButton(imgui, "biome_control_reset_all_settings", "Reset All Controls", {
+        lib.widgets.confirmButton(imgui, session, "biome_control_reset_all_settings", "Reset All Controls", {
             confirmLabel = "Confirm Reset All",
             onConfirm = function()
                 session.resetToDefaults()
