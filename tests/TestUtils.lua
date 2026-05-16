@@ -210,7 +210,7 @@ function ResetBiomeControlHarness(opts)
         registerHooks = opts.registerHooks and logic.registerHooks or nil,
         drawTab = function() end,
     })
-    host.activate()
+    host.tryActivate()
 
     if opts.godAvailability then
         lib.integrations.register("run-director.god-availability", "TestGodPool", {
