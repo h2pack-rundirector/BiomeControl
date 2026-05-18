@@ -10,10 +10,26 @@ local function getStorageNode(storage, alias)
     end
 end
 
+local function getStorageIndex(storage, alias)
+    for index, node in ipairs(storage) do
+        if node.alias == alias then
+            return index
+        end
+    end
+end
+
 local function getField(fields, alias)
     for _, field in ipairs(fields or {}) do
         if field.alias == alias then
             return field
+        end
+    end
+end
+
+local function getFieldIndex(fields, alias)
+    for index, field in ipairs(fields or {}) do
+        if field.alias == alias then
+            return index
         end
     end
 end
@@ -49,6 +65,8 @@ function TestBiomeControlData:testExtensionControlsAreAggregatedIntoCatalogSurfa
     lu.assertEquals(controls.biomeSpecials.H[1].alias, "PreventEchoScam")
     lu.assertEquals(controls.biomeRewards.N[2].alias, "PackedBannedEphyraSubRoomRewards")
     lu.assertEquals(controls.packedRewardFields.PackedBannedEphyraSubRoomRewards.alias, "PackedBannedEphyraSubRoomRewards")
+    lu.assertEquals(controls.packedRewardFieldsOrdered[1].alias, "PackedBannedEphyraSubRoomRewards")
+    lu.assertEquals(controls.packedRewardFieldsOrdered[2].alias, "PackedBannedEphyraSubRoomRewardsHard")
 end
 
 function TestBiomeControlData:testStorageKeepsExtensionAliasesStable()
@@ -63,4 +81,24 @@ function TestBiomeControlData:testStorageKeepsExtensionAliasesStable()
     local packed = getStorageNode(storage, "PackedBannedEphyraSubRoomRewards")
     lu.assertEquals(packed.type, "packedInt")
     lu.assertEquals(#packed.bits, 16)
+end
+
+function TestBiomeControlData:testGeneratedStorageKeepsBiomeOrderForExtensionFields()
+    local data = dofile("src/mods/data.lua")
+    local catalog = data.catalog
+    local storage = data.storage.build()
+
+    lu.assertTrue(
+        getStorageIndex(storage, "PackedBannedEphyraSubRoomRewards")
+            < getStorageIndex(storage, "PackedBannedEphyraSubRoomRewardsHard")
+    )
+
+    local storyIndex = getFieldIndex(catalog.modeStorageFields, "ModeStoryArachne")
+    local ephyraMinibossIndex = getFieldIndex(catalog.modeStorageFields, "EphyraMiniBossMode")
+    local thessalyMinibossIndex = getFieldIndex(catalog.modeStorageFields, "ThessalyMiniBossMode")
+    lu.assertNotNil(storyIndex)
+    lu.assertNotNil(ephyraMinibossIndex)
+    lu.assertNotNil(thessalyMinibossIndex)
+    lu.assertTrue(storyIndex < ephyraMinibossIndex)
+    lu.assertTrue(ephyraMinibossIndex < thessalyMinibossIndex)
 end

@@ -153,18 +153,28 @@ local function appendBiomeControls(model, biome)
     appendControlList(model.biomeSpecials[biome.key], controls.specials)
 end
 
-local function getPackedRewardFields(biomeRewards)
+local function getPackedRewardFields(biomes, biomeRewards)
     local packedRewardFields = {}
+    local orderedAliases = {}
 
-    for _, rewards in pairs(biomeRewards or {}) do
-        for _, reward in ipairs(rewards) do
+    for _, biome in ipairs(biomes or {}) do
+        local rewards = biomeRewards and biomeRewards[biome.key] or nil
+        for _, reward in ipairs(rewards or {}) do
             if reward.kind == "packedCheckboxes" and type(reward.alias) == "string" and reward.alias ~= "" then
+                if packedRewardFields[reward.alias] == nil then
+                    orderedAliases[#orderedAliases + 1] = reward.alias
+                end
                 packedRewardFields[reward.alias] = reward
             end
         end
     end
 
-    return packedRewardFields
+    local ordered = {}
+    for _, alias in ipairs(orderedAliases) do
+        ordered[#ordered + 1] = packedRewardFields[alias]
+    end
+
+    return packedRewardFields, ordered
 end
 
 local function getRangeFieldLookup(rangeFields)
@@ -203,6 +213,7 @@ function catalog.create(args)
         biomeRewards = {},
         biomeSpecials = {},
         packedRewardFields = {},
+        packedRewardFieldsOrdered = {},
         rangeFieldLookup = {},
     }
 
@@ -220,7 +231,7 @@ function catalog.create(args)
         appendBiomeControls(model, biome)
     end
 
-    model.packedRewardFields = getPackedRewardFields(model.biomeRewards)
+    model.packedRewardFields, model.packedRewardFieldsOrdered = getPackedRewardFields(biomes, model.biomeRewards)
     model.rangeFieldLookup = getRangeFieldLookup(model.rangeFields)
 
     for _, entry in ipairs(roomDefinitionSpecs) do
@@ -231,7 +242,8 @@ function catalog.create(args)
         defineNPCControl(model, args.defaults, model.biomeMap, entry)
     end
 
-    for _, entries in pairs(model.biomeRooms or {}) do
+    for _, biome in ipairs(biomes) do
+        local entries = model.biomeRooms[biome.key] or {}
         for _, entry in ipairs(entries) do
             if entry.kind == "modeField" then
                 entry.modeKey = entry.modeKey or entry.alias or entry.label

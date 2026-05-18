@@ -54,7 +54,8 @@ local function addStateFields(nodes, stateFields, packedRewardFields)
 end
 
 local function addPackedRewardFields(nodes, packedRewardFields)
-    for alias, reward in pairs(packedRewardFields) do
+    for _, reward in ipairs(packedRewardFields or {}) do
+        local alias = reward.alias
         local bits = {}
         for _, option in ipairs(reward.options or {}) do
             bits[#bits + 1] = {
@@ -117,9 +118,9 @@ function storage.build(data)
         { type = "string", alias = "SurfaceTab",    persist = false, hash = false, default = "NPCs", maxLen = 32 },
     }
 
-    local packedRewardFields = catalog.packedRewardFields
+    local packedRewardFields = catalog.packedRewardFieldsOrdered
 
-    addStateFields(nodes, catalog.stateFields, packedRewardFields)
+    addStateFields(nodes, catalog.stateFields, catalog.packedRewardFields)
     addPackedRewardFields(nodes, packedRewardFields)
     addRangeFields(nodes, catalog.rangeFields)
 
