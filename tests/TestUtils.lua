@@ -206,7 +206,7 @@ local function refreshGodAvailabilityProvider(pluginGuid, godAvailability)
         })
     end
 
-    host.tryActivate()
+    host.activate()
 end
 
 function ResetBiomeControlHarness(opts)
@@ -236,7 +236,7 @@ function ResetBiomeControlHarness(opts)
     if opts.registerHooks then
         logic.registerHooks(host, store)
     end
-    host.tryActivate()
+    host.activate()
     refreshGodAvailabilityProvider(pluginGuid, opts.godAvailability)
 
     local liveHost = lib.createFrameworkRuntime("adamant-ModpackFramework").modules.getLiveHost(pluginGuid)

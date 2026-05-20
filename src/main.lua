@@ -18,13 +18,6 @@ local PACK_ID = "run-director"
 local MODULE_ID = "BiomeControl"
 local PLUGIN_GUID = _PLUGIN.guid
 
-local function attachGuiOnce(host)
-    host.fallbackUi.attachGuiOnce(function(fallbackUi)
-        rom.gui.add_imgui(fallbackUi.renderWindow)
-        rom.gui.add_to_menu_bar(fallbackUi.addMenuBar)
-    end)
-end
-
 local function init()
     import_as_fallback(rom.game)
     local data = import("mods/data.lua")
@@ -32,7 +25,7 @@ local function init()
     local logic = import("mods/logic.lua").bind(data)
     local ui = import("mods/ui.lua").bind(data)
 
-    local host, store = lib.tryCreateModule({
+    local host, store = lib.createModule({
         pluginGuid = PLUGIN_GUID,
         config = config,
         modpack = PACK_ID,
@@ -48,10 +41,13 @@ local function init()
         return
     end
 
-    attachGuiOnce(host)
+    host.fallbackUi.attachGuiOnce(function(fallbackUi)
+        rom.gui.add_imgui(fallbackUi.renderWindow)
+        rom.gui.add_to_menu_bar(fallbackUi.addMenuBar)
+    end)
     host.mutation.patch(logic.buildPatchPlan)
     logic.registerHooks(host, store)
-    local ok = host.tryActivate()
+    local ok = host.activate()
     if not ok then
         return
     end
@@ -60,5 +56,5 @@ end
 local loader = reload.auto_single()
 
 modutil.once_loaded.game(function()
-    loader.load(function() end, init)
+    loader.load(nil, init)
 end)
