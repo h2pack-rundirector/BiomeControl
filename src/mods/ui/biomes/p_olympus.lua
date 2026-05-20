@@ -15,9 +15,9 @@ local MINIBOSS_SECTION = {
     types = { "MiniBoss" },
 }
 
-function module.draw(ctx)
-    local drewRooms = components.DrawRoomSection(ctx, definitions, catalog, "P", ROOM_SECTION)
-    local drewMinibosses = components.DrawRoomSection(ctx, definitions, catalog, "P", MINIBOSS_SECTION)
+function module.draw(draw)
+    local drewRooms = components.DrawRoomSection(draw, definitions, catalog, "P", ROOM_SECTION)
+    local drewMinibosses = components.DrawRoomSection(draw, definitions, catalog, "P", MINIBOSS_SECTION)
     return drewRooms or drewMinibosses
 end
 

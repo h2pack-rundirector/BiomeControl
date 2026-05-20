@@ -1,12 +1,12 @@
 local components = {}
 
-function components.DrawSectionHeading(ctx, text, color)
-    ctx.widgets.text(text, { color = color })
-    ctx.widgets.separator()
+function components.DrawSectionHeading(draw, text, color)
+    draw.widgets.text(text, { color = color })
+    draw.widgets.separator()
 end
 
-function components.DrawFixedLabel(ctx, label, width)
-    local imgui = ctx.imgui
+function components.DrawFixedLabel(draw, label, width)
+    local imgui = draw.imgui
     imgui.AlignTextToFramePadding()
     imgui.Text(label)
     imgui.SameLine()
@@ -21,23 +21,23 @@ function components.BuildIntegerValues(minValue, maxValue)
     return values
 end
 
-function components.DrawRangeDropdowns(ctx, minAlias, maxAlias, minValue, maxValue)
-    local imgui = ctx.imgui
-    local session = ctx.session
+function components.DrawRangeDropdowns(draw, minAlias, maxAlias, minValue, maxValue)
+    local imgui = draw.imgui
+    local session = draw.session
     local values = components.BuildIntegerValues(minValue, maxValue)
 
-    ctx.widgets.text("from:", { alignToFramePadding = true })
+    draw.widgets.text("from:", { alignToFramePadding = true })
     imgui.SameLine()
-    local minChanged = ctx.widgets.dropdown(minAlias, {
+    local minChanged = draw.widgets.dropdown(minAlias, {
         label = "",
         values = values,
         controlWidth = 60,
     })
 
     imgui.SameLine()
-    ctx.widgets.text("to", { alignToFramePadding = true })
+    draw.widgets.text("to", { alignToFramePadding = true })
     imgui.SameLine()
-    local maxChanged = ctx.widgets.dropdown(maxAlias, {
+    local maxChanged = draw.widgets.dropdown(maxAlias, {
         label = "",
         values = values,
         controlWidth = 60,
@@ -67,7 +67,7 @@ local function buildEncodedModeOptions(definitions, def)
     return values, displayValues
 end
 
-function components.DrawModeRow(ctx, catalog, alias, label, controlWidth)
+function components.DrawModeRow(draw, catalog, alias, label, controlWidth)
     local entry = catalog.modeEntryLookup[alias]
     local modeValues = {}
     local modeDisplayValues = {}
@@ -78,7 +78,7 @@ function components.DrawModeRow(ctx, catalog, alias, label, controlWidth)
         modeDisplayValues[encoded] = entry.modeDisplayValues[value] or tostring(value)
     end
 
-    ctx.widgets.dropdown(alias, {
+    draw.widgets.dropdown(alias, {
         label = label or (entry and entry.label) or alias,
         tooltip = entry and entry.helpText or nil,
         values = modeValues,
@@ -88,18 +88,18 @@ function components.DrawModeRow(ctx, catalog, alias, label, controlWidth)
     })
 end
 
-function components.DrawCheckboxControl(ctx, control)
-    ctx.widgets.checkbox(control.alias, {
+function components.DrawCheckboxControl(draw, control)
+    draw.widgets.checkbox(control.alias, {
         label = control.label,
         tooltip = control.helpText,
     })
 end
 
-function components.DrawRoomRow(ctx, definitions, catalog, def)
-    local imgui = ctx.imgui
-    local session = ctx.session
+function components.DrawRoomRow(draw, definitions, catalog, def)
+    local imgui = draw.imgui
+    local session = draw.session
     if not def then
-        ctx.widgets.text("Missing room definition", {
+        draw.widgets.text("Missing room definition", {
             color = { 0.65, 0.65, 0.65, 1.0 },
         })
         return
@@ -110,9 +110,9 @@ function components.DrawRoomRow(ctx, definitions, catalog, def)
     local rangeColumnX = 310
     local modeValues, modeDisplayValues = buildEncodedModeOptions(definitions, def)
 
-    components.DrawFixedLabel(ctx, def.label, labelColumnX)
+    components.DrawFixedLabel(draw, def.label, labelColumnX)
     imgui.SetCursorPosX(dropdownColumnX)
-    ctx.widgets.dropdown(def.modeKey, {
+    draw.widgets.dropdown(def.modeKey, {
         label = "",
         values = modeValues,
         displayValues = modeDisplayValues,
@@ -124,22 +124,22 @@ function components.DrawRoomRow(ctx, definitions, catalog, def)
     end, def) == "forced" then
         imgui.SameLine()
         imgui.SetCursorPosX(rangeColumnX)
-        components.DrawRangeDropdowns(ctx, def.rangeMinAlias, def.rangeMaxAlias, def.minDefault, def.maxDefault)
+        components.DrawRangeDropdowns(draw, def.rangeMinAlias, def.rangeMaxAlias, def.minDefault, def.maxDefault)
     end
 end
 
-function components.DrawRoomSection(ctx, definitions, catalog, biomeKey, section)
-    local imgui = ctx.imgui
+function components.DrawRoomSection(draw, definitions, catalog, biomeKey, section)
+    local imgui = draw.imgui
     local drewSection = false
     local biomeDefinitions = catalog.biomeDefinitions and catalog.biomeDefinitions[biomeKey] or {}
 
     for _, roomType in ipairs(section.types or {}) do
         for _, def in ipairs(biomeDefinitions[roomType] or {}) do
             if not drewSection then
-                components.DrawSectionHeading(ctx, section.label, section.color)
+                components.DrawSectionHeading(draw, section.label, section.color)
                 drewSection = true
             end
-            components.DrawRoomRow(ctx, definitions, catalog, def)
+            components.DrawRoomRow(draw, definitions, catalog, def)
         end
     end
 
@@ -149,10 +149,10 @@ function components.DrawRoomSection(ctx, definitions, catalog, biomeKey, section
     return drewSection
 end
 
-function components.DrawPlaceholder(ctx, region)
-    ctx.widgets.text(region)
-    ctx.widgets.separator()
-    ctx.widgets.text("No controls are available for this tab.", {
+function components.DrawPlaceholder(draw, region)
+    draw.widgets.text(region)
+    draw.widgets.separator()
+    draw.widgets.text("No controls are available for this tab.", {
         color = { 0.65, 0.65, 0.65, 1.0 },
     })
 end

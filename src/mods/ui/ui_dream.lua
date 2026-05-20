@@ -1,4 +1,4 @@
-﻿local module = {}
+local module = {}
 local definitions
 local catalog
 local components
@@ -62,12 +62,12 @@ local function BindDraw()
         return values
     end
 
-    function module.draw(ctx)
-        local session = ctx.session
+    function module.draw(draw)
+        local session = draw.session
         NormalizeRoute(session)
 
-        components.DrawSectionHeading(ctx, "Dream Route", { 0.72, 0.80, 1.0, 1.0 })
-        ctx.widgets.checkbox("DreamRouteEnabled", {
+        components.DrawSectionHeading(draw, "Dream Route", { 0.72, 0.80, 1.0, 1.0 })
+        draw.widgets.checkbox("DreamRouteEnabled", {
             label = "Override Dream Run Biomes",
         })
 
@@ -79,7 +79,7 @@ local function BindDraw()
         local used = {}
         for slot, key in ipairs(ROUTE_KEYS) do
             local current = session.view[key]
-            local changed = ctx.widgets.dropdown(key, {
+            local changed = draw.widgets.dropdown(key, {
                 label = "Biome " .. slot,
                 values = BuildSlotValues(slot, previous, used, current),
                 displayValues = biomeDisplayValues,

@@ -26,11 +26,11 @@ local function BuildRegionTabList(region)
     return tabs
 end
 
-local function DrawRegionTab(ctx, region, tabAlias, childId)
-    local imgui = ctx.imgui
-    local session = ctx.session
+local function DrawRegionTab(draw, region, tabAlias, childId)
+    local imgui = draw.imgui
+    local session = draw.session
     local tabs = BuildRegionTabList(region)
-    local activeTab = lib.nav.verticalTabs(imgui, {
+    local activeTab = draw.nav.verticalTabs({
         id = childId .. "Tabs",
         navWidth = 220,
         tabs = tabs,
@@ -42,36 +42,36 @@ local function DrawRegionTab(ctx, region, tabAlias, childId)
 
     imgui.BeginChild(childId .. "Detail", 0, 0, false)
     if activeTab == "NPCs" then
-        npcUi.drawRegion(ctx, region)
+        npcUi.drawRegion(draw, region)
     else
-        biomeUi.draw(ctx, activeTab)
+        biomeUi.draw(draw, activeTab)
     end
     imgui.EndChild()
 end
 
-function module.drawTab(ctx)
-    local imgui = ctx.imgui
+function module.drawTab(draw)
+    local imgui = draw.imgui
     if not imgui.BeginTabBar("BiomeControlLeanTabs") then
         return false
     end
 
     if imgui.BeginTabItem("Underworld") then
-        DrawRegionTab(ctx, UNDERWORLD_REGION, UNDERWORLD_TAB_ALIAS, "BiomeControlUnderworld")
+        DrawRegionTab(draw, UNDERWORLD_REGION, UNDERWORLD_TAB_ALIAS, "BiomeControlUnderworld")
         imgui.EndTabItem()
     end
 
     if imgui.BeginTabItem("Surface") then
-        DrawRegionTab(ctx, SURFACE_REGION, SURFACE_TAB_ALIAS, "BiomeControlSurface")
+        DrawRegionTab(draw, SURFACE_REGION, SURFACE_TAB_ALIAS, "BiomeControlSurface")
         imgui.EndTabItem()
     end
 
     if imgui.BeginTabItem("Dream") then
-        dreamUi.draw(ctx)
+        dreamUi.draw(draw)
         imgui.EndTabItem()
     end
 
     if imgui.BeginTabItem("Settings") then
-        settingsUi.draw(ctx)
+        settingsUi.draw(draw)
         imgui.EndTabItem()
     end
 
@@ -79,11 +79,11 @@ function module.drawTab(ctx)
     return false
 end
 
-function module.drawQuickContent(ctx)
-    ctx.widgets.confirmButton("biome_control_quick_reset_all", "Reset To Default", {
+function module.drawQuickContent(draw)
+    draw.widgets.confirmButton("biome_control_quick_reset_all", "Reset To Default", {
         confirmLabel = "Confirm Reset All",
         onConfirm = function()
-            ctx.session.resetToDefaults()
+            draw.session.resetToDefaults()
         end,
     })
 end
